@@ -1,5 +1,3 @@
-#!/usr/local/bin/perl
-
 use strict;
 use warnings;
 
@@ -13,7 +11,7 @@ BEGIN {
     };
 }
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 if ($skip) {
     skip ($skip, 1);
@@ -47,6 +45,7 @@ NT
 NT's
 NtQuerySystemInformation
 Nemours
+OSes
 PIDs
 PPM
 PT
@@ -55,6 +54,7 @@ Prantl
 ProcessId
 Pulist
 Ramdane
+ReactOS
 Roth
 SID
 Urist
@@ -70,6 +70,7 @@ dll
 exe
 exportable
 gory
+ness
 ntdll
 pids
 ps
