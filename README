@@ -1,0 +1,100 @@
+Win32::Process::Info
+
+This module is intended to partly plug a perceived gap in Perl's Win32
+functionality: the inability to traverse all (or nearly all) the processes
+on the system, and get information on them. In a futile effort to be all
+things to all people, it has a couple variants, which are (semi-) trans-
+parantly selected among on the fly, depending on the environment in which
+it finds itself:
+* WMI - used if WMI is found on the machine;
+* NT - used if WMI is not found, but Win32::IsWinNT () is TRUE.
+If neither of these obtains (e.g. you're running Windows 95), I'm
+afraid you're out of luck. You actually have control of which variant is
+used, should you choose to exercise it. See the docs for more detail.
+
+Because of Windows NT's security, it may not in fact be possible to see
+literally every process; and some (e.g. process ID 0, the idle process)
+may not have anything worth seeing. But this module does the best it can
+with the rest.
+
+Win32::Process::Info.pm contains POD documentation, which I do not
+intend to repeat here. The following sample will give a flavor for how
+it works.
+
+use Win32::Process::Info;
+my $pi = Win32::Process::Info->new ();
+foreach $proc ($pi->GetProcInfo ()) {
+    print "\n";
+    foreach (sort keys %$proc) {
+        print "$_ => $proc->{$_}\n";
+        }
+    }
+
+That is to say, GetProcInfo returns a list of anonymous hashes
+containing whatever information can be gleaned. The kit includes
+a slightly more extensive script, ProcessInfo.pl, which produces
+very slightly friendlier output.
+
+Win32::Process::Info uses other libraries which are not part of the
+standard Perl distribution (or weren't last time I looked!) Some are
+only used under certain conditions, but you may see degraded
+performance if you don't have them. The libraries used are
+* Win32 - Required
+* Win32::API - Required only by the NT variant.
+* Win32API::Registry - Used only by the NT variant. It's optional
+    there, but if you don't have it you may get somewhat less
+    information, because the debug privilege can't be set.
+* Win32::OLE - Required only by the WMI variant.
+
+As of this release, all are standard with ActivePerl 5.6.1. Enough
+are available under ActivePerl 5.8.0 to let the module pass the
+self-test, but beyond that I can't say what the situation is.
+
+
+INSTALLATION INSTRUCTIONS
+------------ ------------
+
+CPAN kit:
+
+expand the kit using GZip and TAR (or equivalent). Then issue the
+standard commands:
+
+ perl Makefile.PL
+ nmake
+ nmake test
+ nmake install
+
+Note that the "test" step is optional, but recommended. Also note that
+although Win32 is required, it's _not_ in the dependencies, because
+PPM3 doesn't seem to deal with it very well, and I suspect that most
+users of this module have it installed already.
+
+See ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake if you need it.
+
+
+PPM kit:
+
+Expand the kit using unzip (or equivalent). Then
+
+ ppm install Win32-Process-Info.ppd
+
+
+If all else fails:
+
+Get the Info.pm file and the Info folder from your kit by whatever means
+you can, and drop them in /site/lib/Win32/Process (or wherever ...).
+
+
+COPYRIGHT NOTICE
+--------- ------
+
+Copyright 2001, 2002, 2003, 2004, 2005 by E. I. DuPont de Nemours and
+Company, Inc. All rights reserved.
+
+Changes since 1.006 copyright 2007 by Thomas R. Wyant, III. All rights
+reserved.
+
+This module is free software; you can use it, redistribute it and/or
+modify it under the same terms as Perl itself.
+

@@ -1,0 +1,28 @@
+---
+name: Win32-Process-Info
+version: 1.009_01
+author:
+  - Tom Wyant (wyant at cpan dot org)
+abstract: Get information on arbitrary processes in Windows NT
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+provides:
+  Win32::Process::Info:
+    file: lib/Win32/Process/Info.pm
+    version: 1.009_01
+  Win32::Process::Info::DummyRoutine:
+    file: lib/Win32/Process/Info/NT.pm
+  Win32::Process::Info::NT:
+    file: lib/Win32/Process/Info/NT.pm
+    version: 1.006_01
+  Win32::Process::Info::PT:
+    file: lib/Win32/Process/Info/PT.pm
+    version: 0.000_01
+  Win32::Process::Info::WMI:
+    file: lib/Win32/Process/Info/WMI.pm
+    version: 1.002_01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
