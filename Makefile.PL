@@ -1,7 +1,13 @@
+use 5.006;
+
+use strict;
+use warnings;
+
 use Config;
 use ExtUtils::MakeMaker;
 
-my $vers = $] >= 5.008 ? '-5.8' : '';
+## my $vers = $] >= 5.008 ? '-5.8' : '';
+my $vers = '';
 
 WriteMakefile (
 	NAME => 'Win32::Process::Info',

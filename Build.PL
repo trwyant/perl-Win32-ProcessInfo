@@ -1,3 +1,5 @@
+use 5.006;
+
 use strict;
 use warnings;
 
@@ -5,7 +7,7 @@ use Module::Build;
 use Config;
 use FileHandle;
 
-our $VERSION = '0.002';
+our $VERSION = '0.002_01';
 
 my $bldr = Module::Build->new (
 	dist_author => 'Tom Wyant (wyant at cpan dot org)',
