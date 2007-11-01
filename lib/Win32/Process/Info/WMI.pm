@@ -153,14 +153,18 @@ The following methods should be considered public:
 #		Released above changes.
 # 1.003 22-Aug-2007	T. R. Wyant
 #		Updated copyright notice and license.
+# 1.003_01 01-Nov-2007	T. R. Wyant
+#		use warnings;
 
 package Win32::Process::Info::WMI;
 
 use base qw{Win32::Process::Info};
 use vars qw{$VERSION};
-$VERSION = '1.003';
+$VERSION = '1.003_01';
 
 use strict;
+use warnings;
+
 use vars qw{%mutator};
 use Carp;
 use Time::Local;

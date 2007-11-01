@@ -188,12 +188,16 @@ The following methods should be considered public:
 #		Changed elapsed_as_seconds to elapsed_in_seconds in
 #		synopsis code. Also added 'grep' example.
 #		Added PT variant, mainly for testing.
+# 1.010_01 01-Nov-2007 T. R. Wyant
+#		use warnings.
 
 package Win32::Process::Info;
 
-$VERSION = '1.010';
+$VERSION = '1.010_01';
 
 use strict;
+use warnings;
+
 use vars qw{%mutator %static};
 
 use Carp;
@@ -930,6 +934,7 @@ since at least 5.004. Your mileage may, of course, vary.
        Wagner and Derek Smith respectively for pointing out the
        need for these.
        Add and document variant 'PT'.
+ 1.011 use warnings in all modules. This requires Perl 5.6.
 
 =head1 BUGS
 
