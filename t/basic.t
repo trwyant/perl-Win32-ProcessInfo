@@ -4,6 +4,7 @@ use File::Spec;
 use Test;
 
 my ($proc, $wmi);
+my $my_user = getlogin || getpwuid ($<);
 my $nt_skip;
 BEGIN {
     $nt_skip = 'NT-Family OS required.';
@@ -137,5 +138,7 @@ foreach my $variant (qw{NT WMI PT}) {
     print "# Test $test_num - Our own process should be under our username.\n";
     my ($domain, $user) = $skip || !$me->{Owner} ? ('', '') :
 	split '\\\\', $me->{Owner};
-    skip ($skip, $user eq getlogin);
-    }
+    skip ($skip || (defined $my_user ? undef :
+	    "Can not determine username under $^O"),
+	defined $my_user && $user eq $my_user);
+}
