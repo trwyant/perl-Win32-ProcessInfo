@@ -188,12 +188,12 @@ The following methods should be considered public:
 #		Changed elapsed_as_seconds to elapsed_in_seconds in
 #		synopsis code. Also added 'grep' example.
 #		Added PT variant, mainly for testing.
-# 1.010_01 01-Nov-2007 T. R. Wyant
+# 1.011 28-Dec-2007 T. R. Wyant
 #		use warnings.
 
 package Win32::Process::Info;
 
-$VERSION = '1.010_01';
+$VERSION = '1.011';
 
 use strict;
 use warnings;
@@ -935,6 +935,16 @@ since at least 5.004. Your mileage may, of course, vary.
        need for these.
        Add and document variant 'PT'.
  1.011 use warnings in all modules. This requires Perl 5.6.
+       Remove shebang lines in tests.
+       Explicit 'use 5.006' in Makefile.PL and Build.PL, since
+           'use warnings;' requires that.
+       Simplify t/pod.t.
+       Simplify t/pod_coverage.t, and mark all-uppercase methods
+           private.
+       Allow for ExtUtils::MakeMaker development version number
+           in Makefile.PL version check.
+       Skip process username test in t/basic.t if the username
+           cannot be determined.
 
 =head1 BUGS
 
