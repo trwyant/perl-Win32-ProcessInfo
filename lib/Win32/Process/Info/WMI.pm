@@ -160,7 +160,7 @@ package Win32::Process::Info::WMI;
 
 use base qw{Win32::Process::Info};
 use vars qw{$VERSION};
-$VERSION = '1.003_01';
+$VERSION = '1.004';
 
 use strict;
 use warnings;
