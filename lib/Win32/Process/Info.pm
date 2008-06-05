@@ -193,7 +193,7 @@ The following methods should be considered public:
 
 package Win32::Process::Info;
 
-$VERSION = '1.011';
+$VERSION = '1.011_01';
 
 use strict;
 use warnings;
@@ -651,10 +651,14 @@ my $rslt = \%subs;
 my $key_found;
 foreach my $proc (values %prox) {
     $subs{$proc->{ProcessId}} ||= [];
-    next unless $proc->{ParentProcessId};
+    # TRW 1.011_01 next unless $proc->{ParentProcessId};
+    defined (my $pop = $proc->{ParentProcessId}) or next; # TRW 1.011_01
     $key_found++;
-    next unless $prox{$proc->{ParentProcessId}};
-    push @{$subs{$proc->{ParentProcessId}}}, $proc->{ProcessId};
+    # TRW 1.011_01 next unless $prox{$proc->{ParentProcessId}};
+    $prox{$pop} or next;	# TRW 1.011_01
+    $proc->{CreationDate} >= $prox{$pop}{CreationDate} or next;	# TRW 1.011_01
+    # TRW 1.011_01 push @{$subs{$proc->{ParentProcessId}}}, $proc->{ProcessId};
+    push @{$subs{$pop}}, $proc->{ProcessId};
     }
 my %listed;
 return %listed unless $key_found;
@@ -662,7 +666,7 @@ if (@_) {
     $rslt = \%listed;
     while (@_) {
 	my $pid = shift;
-    next unless $subs{$pid};	# TRW 1.006
+	next unless $subs{$pid};	# TRW 1.006
 	next if $listed{$pid};
 	$listed{$pid} = $subs{$pid};
 	push @_, @{$subs{$pid}};
@@ -945,6 +949,11 @@ since at least 5.004. Your mileage may, of course, vary.
            in Makefile.PL version check.
        Skip process username test in t/basic.t if the username
            cannot be determined.
+ 1.011_01
+       Fix Subprocesses() to check for re-used process IDs by
+           comparing parent and subprocess CreationDate, and
+	   only retaining as subprocesses those not created
+           before their parents.
 
 =head1 BUGS
 
