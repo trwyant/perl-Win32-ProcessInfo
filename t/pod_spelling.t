@@ -52,6 +52,7 @@ Ramdane
 ReactOS
 Roth
 SID
+SubProcInfo
 Urist
 Urist's
 VCC
