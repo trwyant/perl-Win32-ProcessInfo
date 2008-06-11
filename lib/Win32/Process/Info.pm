@@ -193,7 +193,7 @@ The following methods should be considered public:
 
 package Win32::Process::Info;
 
-$VERSION = '1.011_01';
+$VERSION = '1.011_02';
 
 use strict;
 use warnings;
@@ -675,6 +675,54 @@ if (@_) {
 return wantarray ? %$rslt : $rslt;
 }
 
+=item @info = $pi->SubProcInfo ();
+
+This is a convenience method which wraps GetProcInfo(). It has the same
+calling sequence, and returns generally the same data. But the data
+returned by this method will also have the {subProcesses} key, which
+will contain a reference to an array of hash references representing the
+data on subprocesses of each process.
+
+Unlike the data returned from Subprocesses(), the data here are not
+flattened; so if you specify one or more process IDs as arguments, you
+will get back at most the number of process IDs you specified; fewer if
+some of the specified processes do not exist.
+
+B<Note well> that a given process can occur more than once in the
+output. If you call SubProcInfo without arguments, the @info array will
+contain every process in the system, even those which are also in some
+other process' {subProcesses} array.
+
+Also unlike Subprocesses(), you will get an exception if you use this
+method with a variant that does not support the ParentProcessId key.
+
+=cut
+
+sub SubProcInfo {
+    my $self = shift;
+    my $opt = ref $_[0] eq 'HASH' ? shift : {};
+    my @data = $self->GetProcInfo ($opt);
+    my %subs = map {$_->{ProcessId} => $_} @data;
+    my $bingo;
+    foreach my $proc (@data) {
+	exists $proc->{ParentProcessId} or next;
+	$proc->{subProcesses} ||= [];
+	$bingo++;
+	defined (my $dad = $subs{$proc->{ParentProcessId}}) or next;
+	defined $dad->{CreationDate} && defined $proc->{CreationDate}
+	    or next;
+	$dad->{CreationDate} > $proc->{CreationDate} and next;
+	push @{$dad->{subProcesses} ||= []}, $proc;
+    }
+    $bingo or croak "Error - Variant '@{[$self->Get('variant')
+    ]}' does not support the ParentProcessId key";
+    if (@_) {
+	map {exists $subs{$_} ? $subs{$_} : ()} @_;
+    } else {
+	@data;
+    }
+}
+
 =item print "$pi Version = @{[$pi->Version ()]}\n"
 
 This method just returns the version number of the
@@ -954,6 +1002,10 @@ since at least 5.004. Your mileage may, of course, vary.
            comparing parent and subprocess CreationDate, and
 	   only retaining as subprocesses those not created
            before their parents.
+ 1.011_02
+       Add SubProcInfo(), which passes off to GetProcInfo() and
+           then synthesizes (if possible) key {subProcesses}
+	   based on the {ParentProcessId} key if that is available.
 
 =head1 BUGS
 
