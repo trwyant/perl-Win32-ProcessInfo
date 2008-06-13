@@ -190,10 +190,21 @@ The following methods should be considered public:
 #		Added PT variant, mainly for testing.
 # 1.011 28-Dec-2007 T. R. Wyant
 #		use warnings.
+# 1.011_01 05-Jun-2008 T. R. Wyant
+#		Fix Subprocesses() to check for re-used process IDs by
+#		comparing parent and subprocess CreationDate, and only
+#		retaining as subprocesses those not created before their
+#		parents.
+# 1.011_02 11-Jun-2008 T. R. Wyant
+#		Add SubProcInfo(), which passes off to GetProcInfo() and
+#		then synthesizes (if possible) key {subProcesses} based
+#		on the {ParentProcessId} key if that is available.
+# 1.012 12-Jun-2008 T. R. Wyant
+#		Production version.
 
 package Win32::Process::Info;
 
-$VERSION = '1.011_02';
+$VERSION = '1.012';
 
 use strict;
 use warnings;
@@ -997,15 +1008,12 @@ since at least 5.004. Your mileage may, of course, vary.
            in Makefile.PL version check.
        Skip process username test in t/basic.t if the username
            cannot be determined.
- 1.011_01
-       Fix Subprocesses() to check for re-used process IDs by
-           comparing parent and subprocess CreationDate, and
-	   only retaining as subprocesses those not created
-           before their parents.
- 1.011_02
-       Add SubProcInfo(), which passes off to GetProcInfo() and
-           then synthesizes (if possible) key {subProcesses}
-	   based on the {ParentProcessId} key if that is available.
+ 1.012
+       Check for re-used parent process IDs in Subprocesses(),
+           and eliminate subprocesses created before their
+           parents.
+       Add SubProcInfo(), which calls GetProcInfo() and then
+           adds key {subProcesses} based on {ParentProcessId}.
 
 =head1 BUGS
 
@@ -1122,8 +1130,8 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 Copyright 2001, 2002, 2003, 2004, 2005 by E. I. DuPont de Nemours and
 Company, Inc.  All rights reserved.
 
-Modifications since version 1.006 copyright 2007 by Thomas R. Wyant,
-III. All rights reserved.
+Modifications since version 1.006 copyright 2007 and 2008 by Thomas R.
+Wyant, III. All rights reserved.
 
 =head1 LICENSE
 
