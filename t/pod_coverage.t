@@ -21,6 +21,6 @@ plan tests => 1;
 pod_coverage_ok (
     'Win32::Process::Info',
     {
-	also_private => [ qr{^[A-Z_]+$}, ],
+	also_private => [ qr{^[[:upper:]\d_]+$}, ],
 	coverage_class => 'Pod::Coverage::CountParents'
     });
