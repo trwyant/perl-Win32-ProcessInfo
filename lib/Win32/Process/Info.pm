@@ -201,10 +201,16 @@ The following methods should be considered public:
 #		on the {ParentProcessId} key if that is available.
 # 1.012 12-Jun-2008 T. R. Wyant
 #		Production version.
+# 1.012_01 19-Jul-2008 T. R. Wyant
+#		Check for ReactOS and disable WMI, since it hangs under
+#		ReactOS 0.3.5.
+# 1.012_02 01-Apr-2008 T. R. Wyant
+#		Check for defined creation dates in Subprocesses(); Idle
+#		and System don't have them, at least under WMI.
 
 package Win32::Process::Info;
 
-$VERSION = '1.012';
+$VERSION = '1.012_02';
 
 use strict;
 use warnings;
@@ -278,6 +284,8 @@ DLL_LOOP:
 	},
     WMI => {
 	check_support => sub {
+		return "Unsupported under ReactOS"
+		    if _isReactOS();
 		return "Unable to load Win32::OLE"
 		    unless eval {require Win32::OLE};
 		return 0;
@@ -629,6 +637,15 @@ passing any necessary arguments.
 
 }	# End local symbol block.
 
+
+{
+    my $is_reactos = $^O eq 'MSWin32' && lc $ENV{OS} eq 'reactos';
+    sub _isReactOS {
+	return $is_reactos;
+    }
+}
+
+
 =item %subs = $pi->Subprocesses ([pid ...])
 
 This method takes as its argument a list of PIDs, and returns a hash
@@ -667,7 +684,11 @@ foreach my $proc (values %prox) {
     $key_found++;
     # TRW 1.011_01 next unless $prox{$proc->{ParentProcessId}};
     $prox{$pop} or next;	# TRW 1.011_01
-    $proc->{CreationDate} >= $prox{$pop}{CreationDate} or next;	# TRW 1.011_01
+# TRW 1.012_02    $proc->{CreationDate} >= $prox{$pop}{CreationDate} or next;	# TRW 1.011_01
+    (defined($proc->{CreationDate}) &&
+	defined($prox{$pop}{CreationDate}) && 
+        $proc->{CreationDate} >= $prox{$pop}{CreationDate})
+	or next;	# TRW 1.012_02
     # TRW 1.011_01 push @{$subs{$proc->{ParentProcessId}}}, $proc->{ProcessId};
     push @{$subs{$pop}}, $proc->{ProcessId};
     }
@@ -1014,6 +1035,11 @@ since at least 5.004. Your mileage may, of course, vary.
            parents.
        Add SubProcInfo(), which calls GetProcInfo() and then
            adds key {subProcesses} based on {ParentProcessId}.
+ 1.013
+       Disable WMI under ReactOS (otherwise it dies horribly).
+       Have Subprocesses() skip processes with undefined creation
+           dates. Thanks to erikweidel for the bug report and
+	   the patch.
 
 =head1 BUGS
 
@@ -1130,8 +1156,8 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 Copyright 2001, 2002, 2003, 2004, 2005 by E. I. DuPont de Nemours and
 Company, Inc.  All rights reserved.
 
-Modifications since version 1.006 copyright 2007 and 2008 by Thomas R.
-Wyant, III. All rights reserved.
+Modifications since version 1.006 copyright 2007, 2008 and 2009 by
+Thomas R.  Wyant, III. All rights reserved.
 
 =head1 LICENSE
 

@@ -11,7 +11,9 @@ BEGIN {
     eval {
 	require Win32;
 
-	if (eval {require Win32::OLE; 1}) {
+	if ($^O eq 'MSWin32' && lc $ENV{OS} eq 'reactos') {
+	    $wmi = "WMI does not work under ReactOS";
+	} elsif (eval {require Win32::OLE; 1}) {
 	    my $old_warn = Win32::OLE->Option ('Warn');	# Sure wish I could localize this baby.
 	    Win32::OLE->Option (Warn => 0);
 	    $wmi = Win32::OLE->GetObject ('winmgmts:{impersonationLevel=impersonate,(Debug)}!//./root/cimv2');
