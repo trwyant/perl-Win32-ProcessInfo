@@ -1,15 +1,17 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
+
 use Data::Dumper;
 use Getopt::Std;
 use Win32::Process::Info;
 
-$| = 1;
+local $| = 1;
 
 my %opt;
 
-getopts ('bcdem:n:pr:stu:v:x', \%opt) && !($opt{s} && $opt{x})
+(getopts ('bcdem:n:pr:stu:v:x', \%opt) && !($opt{s} && $opt{x}))
     or die <<"usage end";
 
 Testbed and demonstrator for Win32::Process::Info V $Win32::Process::Info::VERSION

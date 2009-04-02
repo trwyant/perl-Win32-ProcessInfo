@@ -207,13 +207,15 @@ The following methods should be considered public:
 # 1.012_02 01-Apr-2008 T. R. Wyant
 #		Check for defined creation dates in Subprocesses(); Idle
 #		and System don't have them, at least under WMI.
+# 1.012_03 01-Apr-2008 T. R. Wyant
+#		Make Perl::Critic compliant (-stern, with my own profile).
 
 package Win32::Process::Info;
 
-$VERSION = '1.012_02';
-
 use strict;
 use warnings;
+
+our $VERSION = '1.012_03';
 
 use vars qw{%mutator %static};
 
@@ -299,14 +301,15 @@ DLL_LOOP:
     );
 }
 sub _check_variant {
-croak "Error - Variant '$_[0]' is unknown."
-    unless exists $variant_support{$_[0]};
-exists $variant_support{$_[0]}{unsupported} or croak <<eod;
-Error - Variant '$_[0]' support status is unknown. This can happen if
+my ($variant) = @_;
+croak "Error - Variant '$variant' is unknown."
+    unless exists $variant_support{$variant};
+exists $variant_support{$variant}{unsupported} or croak <<eod;
+Error - Variant '$variant' support status is unknown. This can happen if
         you 'use Win32::Process::Info ();'. Please do not do that.
 eod
-croak "Error - Variant '$_[0]' is unsupported on your configuration. $variant_support{$_[0]}{unsupported}"
-    if $variant_support{$_[0]}{unsupported};
+croak "Error - Variant '$variant' is unsupported on your configuration. $variant_support{$variant}{unsupported}"
+    if $variant_support{$variant}{unsupported};
 return 1;
 }
 
@@ -380,13 +383,13 @@ variant in use does not support.
 
 my @argnam = qw{host variant};
 sub new {
-my $class = shift;
+my ($class, @params) = @_;
 $class = ref $class if ref $class;
 my %arg;
 my ($self, @probs, $variant);
 
 my $inx = 0;
-foreach my $inp (@_) {
+foreach my $inp (@params) {
     if (ref $inp eq 'HASH') {
 	foreach my $key (keys %$inp) {$arg{$key} = $inp->{$key}}
 	}
@@ -404,7 +407,7 @@ foreach my $inp (@_) {
 
 my $mach = $arg{host} or delete $arg{host};
 my $try = $arg{variant} || $static{variant} || 'WMI,NT,PT';
-foreach $variant (grep {$_} split '\W+', $try) {
+foreach my $variant (grep {$_} split '\W+', $try) {
     eval {
 	_check_variant ($variant);
 	$self = $variant_support{$variant}{make}->(\%arg);
@@ -447,10 +450,10 @@ not available as a class attribute.
 =cut
 
 sub Get {
-my $self = shift;
+my ($self, @args) = @_;
 $self = \%static unless ref $self;
 my @vals;
-foreach my $name (@_) {
+foreach my $name (@args) {
     croak "Error - Attribute '$name' does not exist."
 	unless exists $self->{$name};
     croak "Error - Attribute '$name' is private."
@@ -491,15 +494,15 @@ nothing useful back.
 =cut
 
 sub Set {
-my $self = shift;
+my ($self, @args) = @_;
 croak "Error - Set requires an even number of arguments."
-    if @_ % 2;
+    if @args % 2;
 $self = \%static unless ref $self;
 my $mutr = $self->{_mutator} || \%mutator;
 my @vals;
-while (@_) {
-    my $name = shift;
-    my $val = shift;
+while (@args) {
+    my $name = shift @args;
+    my $val = shift @args;
     croak "Error - Attribute '$name' does not exist."
 	unless exists $self->{$name};
     croak "Error - Attribute '$name' is read-only."
@@ -612,9 +615,9 @@ passing any necessary arguments.
     my $idempotent;
 
     sub import {
-	my $pkg = shift;
+	my ($pkg, @params) = @_;
 	my (@args, @vars);
-	foreach (@_) {
+	foreach (@params) {
 	    if (exists $variant_support{$_}) {
 		push @vars, $_;
 	    } else {
@@ -633,6 +636,7 @@ passing any necessary arguments.
 		    $variant_support{$try}{check_support}->()} || $@;
 	    }
 	}
+	return;
     }
 
 }	# End local symbol block.
@@ -671,7 +675,7 @@ attribute, you get back an empty hash. Specifically:
 =cut
 
 sub Subprocesses {
-my $self = shift;
+my ($self, @args) = @_;
 my %prox = map {($_->{ProcessId} => $_)}
 	@{$self->GetProcInfo ({no_user_info => 1})};
 my %subs;
@@ -694,14 +698,14 @@ foreach my $proc (values %prox) {
     }
 my %listed;
 return %listed unless $key_found;
-if (@_) {
+if (@args) {
     $rslt = \%listed;
-    while (@_) {
-	my $pid = shift;
+    while (@args) {
+	my $pid = shift @args;
 	next unless $subs{$pid};	# TRW 1.006
 	next if $listed{$pid};
 	$listed{$pid} = $subs{$pid};
-	push @_, @{$subs{$pid}};
+	push @args, @{$subs{$pid}};
 	}
     }
 return wantarray ? %$rslt : $rslt;
@@ -731,8 +735,8 @@ method with a variant that does not support the ParentProcessId key.
 =cut
 
 sub SubProcInfo {
-    my $self = shift;
-    my $opt = ref $_[0] eq 'HASH' ? shift : {};
+    my ($self, @args) = @_;
+    my $opt = ref $args[0] eq 'HASH' ? shift @args : {};
     my @data = $self->GetProcInfo ($opt);
     my %subs = map {$_->{ProcessId} => $_} @data;
     my $bingo;
@@ -741,17 +745,17 @@ sub SubProcInfo {
 	$proc->{subProcesses} ||= [];
 	$bingo++;
 	defined (my $dad = $subs{$proc->{ParentProcessId}}) or next;
-	defined $dad->{CreationDate} && defined $proc->{CreationDate}
+	(defined $dad->{CreationDate} && defined $proc->{CreationDate})
 	    or next;
 	$dad->{CreationDate} > $proc->{CreationDate} and next;
 	push @{$dad->{subProcesses} ||= []}, $proc;
     }
     $bingo or croak "Error - Variant '@{[$self->Get('variant')
     ]}' does not support the ParentProcessId key";
-    if (@_) {
-	map {exists $subs{$_} ? $subs{$_} : ()} @_;
+    if (@args) {
+	return (map {exists $subs{$_} ? $subs{$_} : ()} @args);
     } else {
-	@data;
+	return @data;
     }
 }
 
@@ -774,7 +778,7 @@ return $Win32::Process::Info::VERSION;
 sub _available {
     my $pkg = shift;
     my $var = shift;
-    $variant_support{$var} ?
+    return $variant_support{$var} ?
 	$variant_support{$var}{unsupported} :
 	undef; 
 }
@@ -789,9 +793,9 @@ sub _available {
 #	Either way, the hash is returned.
 
 sub _build_hash {
-my $self = shift;
-my $hash = shift || {};
-while (@_) {
+my ($self, $hash, @args) = @_;
+$hash ||= {};
+while (@args) {
     my $key = shift;
     my $val = shift;
     $val = $self->{_xfrm}{$key}->($self, $val)
@@ -820,13 +824,13 @@ return wantarray ? @_ : $_[0];
 
 
 sub _date_to_time_t {
-my $self = shift;
+my ($self, @args) = @_;
 my @result;
-local $^W;	# Prevent Time::Local 1.1 from complaining. This appears
-$^W = 0;	# to be fixed in 1.11, but since Time::Local is part of
+local $^W = 0;	# Prevent Time::Local 1.1 from complaining. This appears
+		# to be fixed in 1.11, but since Time::Local is part of
 		# the ActivePerl core, there's no PPM installer for it.
 		# At least, not that I can find.
-foreach (@_) {
+foreach (@args) {
     if ($_) {
 	my ($yr, $mo, $da, $hr, $mi, $sc) = m/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/;
 	--$mo;
@@ -1040,6 +1044,8 @@ since at least 5.004. Your mileage may, of course, vary.
        Have Subprocesses() skip processes with undefined creation
            dates. Thanks to erikweidel for the bug report and
 	   the patch.
+       Make Perl::Critic compliant, with the perlcriticrc in the
+           t directory.
 
 =head1 BUGS
 

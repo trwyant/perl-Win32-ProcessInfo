@@ -1,6 +1,3 @@
-use strict;
-use warnings;
-
 =head1 NAME
 
 Win32::Process::Info::PT - Provide process information via Proc::ProcessTable.
@@ -54,12 +51,16 @@ The following subroutines should be considered public:
 
 # 0.001	18-Sep-2007	T. R. Wyant
 #		Initial release.
+# 0.001_01 01-Apr-2009	T. R. Wyant
+#		Make Perl::Critic compliant (to -stern, with my own profile)
 
 package Win32::Process::Info::PT;
 
+use strict;
+use warnings;
+
 use base qw{Win32::Process::Info};
-use vars qw{$VERSION};
-$VERSION = '0.001';
+our $VERSION = '0.001_01';
 
 use Carp;
 use File::Basename;
@@ -184,11 +185,11 @@ to be consistent with the other variants.
     my @fld_sup = Proc::ProcessTable->new ()->fields ();
 
     sub GetProcInfo {
-	my $self = shift;
-	my $opt = ref $_[0] eq 'HASH' ? shift : {};
+	my ($self, @args) = @_;
+	my $opt = ref $args[0] eq 'HASH' ? shift @args : {};
 	my $tbl = Proc::ProcessTable->new ()->table ();
-	if (@_) {
-	    my %filter = map {(($_ eq '.' ? $$ : $_), 1)} @_;
+	if (@args) {
+	    my %filter = map {(($_ eq '.' ? $$ : $_), 1)} @args;
 	    $tbl = [grep {$filter{$_->pid ()}} @$tbl];
 	}
 	my @pinf;
@@ -219,11 +220,11 @@ reference to the list is returned.
 =cut
 
 sub ListPids {
-    my $self = shift;
+    my ($self, @args) = @_;
     my $tbl = Proc::ProcessTable->new ()->table ();
     my @pids;
-    if (@_) {
-	my %filter = map {(($_ eq '.' ? $$ : $_), 1)} @_;
+    if (@args) {
+	my %filter = map {(($_ eq '.' ? $$ : $_), 1)} @args;
 	@pids = grep {$filter{$_}} map {$_->pid} @$tbl;
     } else {
 	@pids = map {$_->pid} @$tbl;
@@ -261,7 +262,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT
 
-Copyright 2007 by Thomas R. Wyant, III. All rights reserved.
+Copyright 2007, 2009 by Thomas R. Wyant, III. All rights reserved.
 
 =head1 LICENSE
 

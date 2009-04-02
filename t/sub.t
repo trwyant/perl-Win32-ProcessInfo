@@ -1,3 +1,5 @@
+package main;
+
 use strict;
 use warnings;
 
@@ -52,3 +54,5 @@ eod
     }
     ok ($bingo);
 }
+
+1;
