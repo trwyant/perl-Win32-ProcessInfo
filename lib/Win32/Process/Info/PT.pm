@@ -60,7 +60,7 @@ use strict;
 use warnings;
 
 use base qw{Win32::Process::Info};
-our $VERSION = '0.001_01';
+our $VERSION = '0.002';
 
 use Carp;
 use File::Basename;

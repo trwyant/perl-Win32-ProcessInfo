@@ -215,7 +215,7 @@ package Win32::Process::Info;
 use strict;
 use warnings;
 
-our $VERSION = '1.012_03';
+our $VERSION = '1.013';
 
 use vars qw{%mutator %static};
 
@@ -1045,7 +1045,7 @@ since at least 5.004. Your mileage may, of course, vary.
            dates. Thanks to erikweidel for the bug report and
 	   the patch.
        Make Perl::Critic compliant, with the perlcriticrc in the
-           t directory.
+           t directory. Except for NT.pm and WMI.pm.
 
 =head1 BUGS
 
