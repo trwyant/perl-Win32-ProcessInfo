@@ -215,7 +215,7 @@ package Win32::Process::Info;
 use strict;
 use warnings;
 
-our $VERSION = '1.013';
+our $VERSION = '1.014';
 
 use vars qw{%mutator %static};
 
@@ -796,8 +796,8 @@ sub _build_hash {
 my ($self, $hash, @args) = @_;
 $hash ||= {};
 while (@args) {
-    my $key = shift;
-    my $val = shift;
+    my $key = shift @args;
+    my $val = shift @args;
     $val = $self->{_xfrm}{$key}->($self, $val)
 	if (exists $self->{_xfrm}{$key});
     $hash->{$key} = $val;
@@ -1046,6 +1046,10 @@ since at least 5.004. Your mileage may, of course, vary.
 	   the patch.
        Make Perl::Critic compliant, with the perlcriticrc in the
            t directory. Except for NT.pm and WMI.pm.
+ 1.014
+       Missed change when replacing @_ with @args. Thanks to Erik
+           Weidel for spotting this. Why the test suite worked for
+	   me I haven't a clue.
 
 =head1 BUGS
 
