@@ -15,7 +15,8 @@ BEGIN {
 	require Win32;
 
 	if ($^O eq 'MSWin32' && lc $ENV{OS} eq 'reactos') {
-	    $wmi = "WMI does not work under ReactOS";
+	    $wmi = undef;	# WMI does not work under ReactOS,
+				# at least as of 0.3.10
 	} elsif (eval {require Win32::OLE; 1}) {
 	    my $old_warn = Win32::OLE->Option ('Warn');	# Sure wish I could localize this baby.
 	    Win32::OLE->Option (Warn => 0);
