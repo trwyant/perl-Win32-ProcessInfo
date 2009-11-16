@@ -6,11 +6,13 @@ CVS/
 ^foo/
 ^Makefile$
 ^MANIFEST\.
+^meta/
 ^pm_to_blib$
 ^t/manifest\.t$
 \.old$
 ^t/sub.t$
 ^t/pod_spelling\.t$
+\.svn/
 \.swp$
 \.tar\.gz$
 ^test_environment$
