@@ -34,7 +34,10 @@ documentation.
 
 This change is somewhat incompatible with 1.006 and earlier because it
 requires the import() method to be called in the correct place with the
-correct arguments. See the import() documentation below for the details.
+correct arguments. If you C<require Win32::Process::Info>, you B<must>
+explicitly call Win32::Process::Info->import().
+
+See the import() documentation below for the details.
 
 B<YOU HAVE BEEN WARNED!>
 
@@ -405,6 +408,10 @@ foreach my $inp (@params) {
     $inx++;
     }
 
+_import_done()
+    or croak __PACKAGE__,
+	'->import() must be called before calling ', __PACKAGE__,
+	'->new()';
 my $mach = $arg{host} or delete $arg{host};
 my $try = $arg{variant} || $static{variant} || 'WMI,NT,PT';
 foreach my $variant (grep {$_} split '\W+', $try) {
@@ -637,6 +644,11 @@ passing any necessary arguments.
 	    }
 	}
 	return;
+    }
+
+    # Return the number of times import() done.
+    sub _import_done {
+	return $idempotent;
     }
 
 }	# End local symbol block.
@@ -1177,3 +1189,4 @@ L<http://perldoc.perl.org/index-licence.html> for the current licenses.
 
 =cut
 
+# ex: set textwidth=72
