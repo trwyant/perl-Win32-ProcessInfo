@@ -1,1 +1,129 @@
-For changes, see the documentation to Win32::Process::Info.
+1.014	06-Apr-2009	T. R. Wyant
+  Missed change when replacing @_ with @args. Thanks to Erik Weidel for
+    spotting this. Why the test suite worked for me I haven't a clue.
+
+1.013	02-Apr-2009	T. R. Wyant
+  Disable WMI under ReactOS (otherwise it dies horribly).
+  Have Subprocesses() skip processes with undefined creation dates.
+    Thanks to erikweidel for the bug report and the patch.
+  Make Perl::Critic compliant, with the perlcriticrc in the t directory.
+    Except for NT.pm and WMI.pm.
+
+1.012	12-Jun-2008	T. R. Wyant
+  Check for re-used parent process IDs in Subprocesses(), and eliminate
+    subprocesses created before their parents.
+  Add SubProcInfo(), which calls GetProcInfo() and then adds key
+    {subProcesses} based on {ParentProcessId}.
+
+1.011 28-Dec-2007 T. R. Wyant
+  use warnings in all modules. This requires Perl 5.6.
+  Remove shebang lines in tests.
+  Explicit 'use 5.006' in Makefile.PL and Build.PL, since 'use
+    warnings;' requires that.
+  Simplify t/pod.t.
+  Simplify t/pod_coverage.t, and mark all-uppercase methods private.
+  Allow for ExtUtils::MakeMaker development version number in
+    Makefile.PL version check.
+  Skip process username test in t/basic.t if the username cannot be
+    determined.
+
+1.010	22-Aug-2007	T. R. Wyant
+  Replace 'elapsed_as_seconds' with 'elapsed_in_seconds' in synopsis
+    code. Also add 'grep' example. Thanks to David Wagner and Derek
+    Smith respectively for pointing out the need for these.
+  Add and document variant 'PT'.
+
+1.009	16-Mar-2007	T. R. Wyant
+  Fix synopsis code so that it compiles as-is.
+  Correct the error message generated when new() is passed a reference
+    other than a hash reference.
+
+1.008 17-Jan-2007	T. R. Wyant
+  Clean up the documentation. The new import() documentation, in
+    particular, contained a couple abortive attempts to get it right.
+    But the real incentive is that the Windows build on ActiveState
+    failed because the Makefile was older than Makefile.PL (?!?), so I
+    thought I would try sending it through again.
+
+1.007 10-Jan-2007	T. R. Wyant
+  Use the import() hook to determine which variants may be used in the
+    script. The previous method was just to feel around the system, and
+    this caused problem if fork() was being used. Thanks to Malcolm
+    Nooning for finding the problem, helping me work out the solution,
+    and sharing the results of his correspondence with ActiveState.
+
+1.006	23-Sep-2005	T. R. Wyant
+  Silently skip non-existent processes in the Subprocesses method. Fix
+    provided by Kirk Baucom of Itron, and accepted with thanks.
+
+1.005	15-Mar-2005	T. R. Wyant
+  Moved assertion of seDebugPriv in the NT variant to stop token handle
+    leak.
+  Turned off $^W for timelocal call, since it throws random warnings
+    otherwise.
+
+1.004	30-Dec-2004	T. R. Wyant
+  Remove commented-out dependencies in Makefile.PL, since CPAN's now
+    checking. The only one that really counts is Win32, but
+    ActiveState's PPM3 chokes on this, or at least did as of January
+    2001.
+
+1.003	19-Dec-2004	T. R. Wyant
+  Documented PERL_WIN32_PROCESS_INFO_WMI_DEBUG correctly (the docs had a
+    _PRIV on the end).
+  Recorded the variant name in the object.
+  Clarified (hopefully) the docs on how to use the
+    PERL_WIN32_PROCESS_INFO_VARIANT environment variable.
+  Added the current status and whereabouts of Win32::IProc. Thanks to
+    Eric Bluestein (http://www.emblue.com/) for pointing this out.
+
+1.002	07-Jun-2004	T. R. Wyant
+  Document leaky behavior of WMI variant, and try to make it leak less.
+  Document related modules.
+
+1.001	05-Jan-2004	T. R. Wyant
+  Removed dependency on Win32. We still need it, of course, but PPM3
+    chokes on it, and I figure anyone who IS using PPM3 already has it,
+    and anyone who ISN'T is smart enough to figure out what's going on -
+    or at least read the README.
+
+1.000	09-Oct-2003	T. R. Wyant
+  Add assert_debug_priv hash argument to the 'new' method.
+  Fix documentation, both pod errors and actual doc bugs.
+  When the only thing you've done in two months is add a semicolon to a
+    comment, it's probably time to call it production code.
+
+0.014	27-Jun-2003	T. R. Wyant
+  Track changes in Win32::API. Can no longer "require" it.
+  WMI variant no longer asserts debug privilege by default.
+  Use environment variable PERL_WIN32_PROCESS_INFO_WMI_DEBUG to tell the
+    WMI variant whether to assert debug.
+  Use environment variable PERL_WIN32_PROCESS_INFO_WMI_PARIAH to encode
+    processes to skip when determining the owner.
+  Add optional first hash ref argument to GetProcInfo.
+  Add Subprocesses() method.
+
+0.013	13-Mar-2003	T. R. Wyant
+  Use environment variable PERL_WIN32_PROCESS_INFO_VARIANT to specify
+    the default variant list.
+  Add a hash reference argument to new (); use this to specify username
+    and password to the WMI variant.
+  Turn on debug privilege in NT variant. This also resulted in
+    dependency on Win32API::Registry.
+  Return OwnerSid and Owner in NT variant.
+  Remove dependencies on Win32::API, Win32::OLE, and Win32API::Registry
+    from Makefile.PL, since these are conditional.
+
+0.012	06-Nov-2002	T. R. Wyant
+  Made attributes beginning with "_" hidden.
+  Add attribute _mutator, containing a reference to %mutator.
+
+0.011	14-Sep-2002	T. R. Wyant
+  Added method Version().
+  Fixed warning in NT.pm when -w in effect. Fix provided by Judy Hawkins
+    (of Pitney Bowes, according to her mailing address), and accepted
+    with thanks.
+
+0.010	02-Sep-2002	T. R. Wyant
+  Released to CPAN.
+
