@@ -8,8 +8,6 @@ use Module::Build;
 use My::Module::Build;
 use Config;
 
-our $VERSION = '0.003_01';
-
 (my $mbv = Module::Build->VERSION) =~ s/_//g;
 
 my %args = (
