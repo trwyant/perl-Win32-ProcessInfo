@@ -2,6 +2,7 @@ Build.PL
 Changes
 eg/ProcessInfo.pl
 eg/README
+inc/My/Module/Build.pm
 lib/Win32/Process/Info.pm
 lib/Win32/Process/Info/NT.pm
 lib/Win32/Process/Info/PT.pm
@@ -11,9 +12,11 @@ MANIFEST			This list of files
 META.yml
 README
 t/basic.t
-t/critic.t
-t/executable.t
-t/manifest.t
-t/perlcriticrc
-t/pod.t
-t/pod_coverage.t
+t/sub.t
+xt/critic.t
+xt/executable.t
+xt/manifest.t
+xt/perlcriticrc
+xt/pod.t
+xt/pod_coverage.t
+xt/pod_spelling.t
