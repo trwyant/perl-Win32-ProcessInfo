@@ -534,19 +534,20 @@ published by Macmillan Technical Publishing, ISBN 1-57870-215-1
 
 Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2001, 2002, 2003, 2004 by
-E. I. DuPont de Nemours and Company, Inc.
+Copyright (C) 2001-2005 by E. I. DuPont de Nemours and Company, Inc.
 
-Modifications since version 1.001_01 copyright 2007 by Thomas R. Wyant,
-III. All rights reserved.
+Copyright (C) 2007, 2010 by Thomas R. Wyant, III
 
-=head1 LICENSE
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
 
-This module is free software; you can use it, redistribute it
-and/or modify it under the same terms as Perl itself. Please see
-L<http://perldoc.perl.org/index-licence.html> for the current licenses.
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
 
 =cut
 
+# ex: set textwidth=72 :
