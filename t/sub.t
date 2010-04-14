@@ -17,7 +17,11 @@ my $pi = Win32::Process::Info->new(undef, 'NT,PT') or do {
     exit;
 };
 
-my $dad = getppid();
+my $dad;
+eval { $dad = getppid(); 1 } or do {
+    print "1..0 # Skip getppid() not implemented, or failed\n";
+    exit;
+};
 
 plan (tests => 2);
 
