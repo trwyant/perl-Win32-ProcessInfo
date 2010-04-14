@@ -9,12 +9,14 @@ use Test;
 my ($proc, $wmi);
 my $my_user = getlogin || getpwuid ($<);
 my $nt_skip;
+my $reactos;
 BEGIN {
     $nt_skip = 'NT-Family OS required.';
+    $reactos = $^O eq 'MSWin32' && lc $ENV{OS} eq 'reactos';
     eval {
 	require Win32;
 
-	if ($^O eq 'MSWin32' && lc $ENV{OS} eq 'reactos') {
+	if ($reactos) {
 	    $wmi = undef;	# WMI does not work under ReactOS,
 				# at least as of 0.3.10
 	} elsif (eval {require Win32::OLE; 1}) {
@@ -85,7 +87,9 @@ my $test_num = 1;
 my $loaded;
 BEGIN {
     $| = 1;	## no critic (RequireLocalizedPunctuationVars)
-    plan (tests => 23);
+    my @todo;
+    $reactos and push @todo, 9;
+    plan ( tests => 23, todo => \@todo );
     print "# Test 1 - Loading the library.\n"
 }
 END {print "not ok 1\n" unless $loaded;}
