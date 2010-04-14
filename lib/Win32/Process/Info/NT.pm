@@ -52,6 +52,8 @@ The following subroutines should be considered public:
 
 package Win32::Process::Info::NT;
 
+use 5.006;
+
 use strict;
 use warnings;
 
@@ -72,31 +74,34 @@ return undef;	## no critic (ProhibitExplicitReturnUndef)
 }
 
 use base qw{Win32::Process::Info};
-use vars qw{$VERSION};
-$VERSION = '1.007';
 
-use vars qw {
-    $AdjustTokenPrivileges
-    $CloseHandle
-    $elapsed_in_seconds
-    $EnumProcesses
-    $EnumProcessModules
-    $FileTimeToSystemTime
-    $GetCurrentProcess
-    $GetModuleFileNameEx
-    $GetPriorityClass
-    $GetProcessAffinityMask
-    $GetProcessIoCounters
-    $GetProcessWorkingSetSize
-    $GetProcessTimes
-    $GetProcessVersion
-    $GetTokenInformation
-    $LookupAccountSid
-    $LookupPrivilegeValue
-    $OpenProcess
-    $OpenProcessToken
-    $VERSION
-    };
+our $VERSION = '1.007';
+
+our $AdjustTokenPrivileges;
+our $CloseHandle;
+our $elapsed_in_seconds;
+our $EnumProcesses;
+our $EnumProcessModules;
+our $FileTimeToSystemTime;
+our $GetCurrentProcess;
+our $GetModuleFileNameEx;
+our $GetPriorityClass;
+our $GetProcessAffinityMask;
+our $GetProcessIoCounters;
+our $GetProcessWorkingSetSize;
+our $GetProcessTimes;
+our $GetProcessVersion;
+our $GetTokenInformation;
+our $LookupAccountSid;
+our $LookupPrivilegeValue;
+our $OpenProcess;
+our $OpenProcessToken;
+
+our $GetSidIdentifierAuthority;
+our $GetSidSubAuthority;
+our $GetSidSubAuthorityCount;
+our $IsValidSid;
+
 use Carp;
 use File::Basename;
 use Win32;
@@ -549,12 +554,6 @@ confess 'Programming error - should not get here';
 }
 
 
-use vars qw{
-    $GetSidIdentifierAuthority
-    $GetSidSubAuthority
-    $GetSidSubAuthorityCount
-    $IsValidSid
-    };
 
 #	_text_sid (pointer to SID)
 
