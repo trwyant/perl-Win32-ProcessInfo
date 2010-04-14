@@ -1,6 +1,3 @@
-use strict;
-use warnings;
-
 =head1 NAME
 
 Win32::Process::Info::NT - Provide process information via NT-native calls.
@@ -52,13 +49,17 @@ The following subroutines should be considered public:
 
 =cut
 
-package Win32::Process::Info::DummyRoutine;
+
+package Win32::Process::Info::NT;
+
+use strict;
+use warnings;
 
 #	The purpose of this is to provide a dummy Call
 #	method for those cases where we might not be able
 #	to map a subroutine.
 
-sub new {
+sub Win32::Process::Info::DummyRoutine::new {
 my $class = shift;
 $class = ref $class if ref $class;
 my $self = {};
@@ -66,11 +67,9 @@ bless $self, $class;
 return $self;
 }
 
-sub Call {
-return undef;
+sub Win32::Process::Info::DummyRoutine::Call {
+return undef;	## no critic (ProhibitExplicitReturnUndef)
 }
-
-package Win32::Process::Info::NT;
 
 use base qw{Win32::Process::Info};
 use vars qw{$VERSION};
@@ -102,6 +101,9 @@ use Carp;
 use File::Basename;
 use Win32;
 use Win32::API;
+
+use constant TokenUser => 1;	# PER MSDN
+use constant TokenOwner => 4;
 
 my $setpriv;
 eval {
@@ -301,8 +303,8 @@ use constant TOKEN_EXECUTE         => STANDARD_RIGHTS_EXECUTE;
 # Pointer	P
 
 sub GetProcInfo {
-my $self = shift;
-my $opt = ref $_[0] eq 'HASH' ? shift : {};
+my ( $self, @args ) = @_;
+my $opt = ref $args[0] eq 'HASH' ? shift @args : {};
 
 $CloseHandle ||= _map ('KERNEL32', 'CloseHandle', [qw{N}], 'V');
 $GetModuleFileNameEx ||=
@@ -331,7 +333,7 @@ $EnumProcessModules ||=
 my $dac = PROCESS_QUERY_INFORMATION | PROCESS_VM_READ;
 my $tac = TOKEN_READ;
 
-@_ = ListPids ($self) unless @_;
+@args or @args = ListPids ($self);
 
 my @pinf;
 
@@ -342,9 +344,9 @@ my @trydac = (
     PROCESS_QUERY_INFORMATION,
     );
 
-foreach my $pid (map {$_ eq '.' ? $$ : $_} @_) {
+foreach my $pid (map {$_ eq '.' ? $$ : $_} @args) {
 
-    $^E = 0;
+    local $^E = 0;
     $dat = $self->_build_hash (undef, ProcessId => $pid);
     $self->_build_hash ($dat, Name => 'System Idle Process')
 	unless $pid;
@@ -410,8 +412,6 @@ foreach my $pid (map {$_ eq '.' ? $$ : $_} @_) {
 	last if $opt->{no_user_info};
 	$OpenProcessToken->Call ($prchdl, $tac, $tokhdl)
 	    or do {$tokhdl = undef; last; };
-	sub TokenUser {1};	# PER MSDN
-	sub TokenOwner {4};
 	my ($dsize, $size_in, $size_out, $sid, $stat, $use, $void);
 	$tokhdl = unpack 'L', $tokhdl;
 
@@ -461,11 +461,13 @@ return wantarray ? @pinf : \@pinf;
 }
 
 sub _to_char_date {
+my @args = @_;
 my @result;
-$FileTimeToSystemTime ||= Win32::API->new ('KERNEL32', 'FileTimeToSystemTime', [qw{P P}], 'I') or
-    croak "Error - Failed to map FileTimeToSystemTime: $^E";
+( $FileTimeToSystemTime ||=
+    Win32::API->new ('KERNEL32', 'FileTimeToSystemTime', [qw{P P}], 'I') )
+    or croak "Error - Failed to map FileTimeToSystemTime: $^E";
 my $systim = '  ' x 8;
-foreach (@_) {
+foreach (@args) {
     $FileTimeToSystemTime->Call ($_, $systim) or
 	croak "Error - FileTimeToSystemTime failed: $^E";
     my $time;
@@ -484,8 +486,9 @@ return $result[0];
 }
 
 sub _ll_to_bigint {
+my @args = @_;
 my @result;
-foreach (@_) {
+foreach (@args) {
     my @data = unpack 'L*', $_;
     while (@data) {
 	my $low = shift @data;
@@ -498,8 +501,9 @@ return $result[0];
 }
 
 sub _clunks_to_secs {
+my @args = @_;
 my @result;
-foreach (_ll_to_bigint (@_)) {
+foreach (_ll_to_bigint (@args)) {
     push @result, $_ / 10_000_000;
     }
 return @result if wantarray;
@@ -516,9 +520,9 @@ reference to the list is returned.
 =cut
 
 sub ListPids {
-my $self = shift;
+my ( $self, @args ) = @_;
 my $filter = undef;
-$filter = {map {(($_ eq '.' ? $$ : $_), 1)} @_} if @_;
+@args and $filter = {map {(($_ eq '.' ? $$ : $_), 1)} @args};
 $EnumProcesses ||= _map ('PSAPI', 'EnumProcesses', [qw{P N P}], 'I');
 my $psiz = 4;
 my $bsiz = 0;
@@ -541,7 +545,7 @@ my $bsiz = 0;
 	}
     return wantarray ? @pids : \@pids;
     }
-
+confess 'Programming error - should not get here';
 }
 
 
@@ -586,8 +590,8 @@ my $sid = shift;
 #	Make sure we have a valid SID
 
 $IsValidSid ||= _map ('ADVAPI32', 'IsValidSid', [qw{P}], 'I');
-my $stat = $IsValidSid->Call ($sid);
-return undef unless $stat;
+my $stat = $IsValidSid->Call ($sid)
+    or return;
 
 
 #	Get the identifier authority.

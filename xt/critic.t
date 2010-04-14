@@ -29,8 +29,9 @@ BEGIN {
 
 # Can't do the following until NT.pm and WMI.pm are brought into compliance
 # all_critic_ok('lib');
-plan (tests => 2);
+plan (tests => 3);
 critic_ok(File::Spec->catfile(qw{lib Win32 Process Info.pm}));
+critic_ok(File::Spec->catfile(qw{lib Win32 Process Info NT.pm}));
 critic_ok(File::Spec->catfile(qw{lib Win32 Process Info PT.pm}));
 
 1;
