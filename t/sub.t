@@ -5,8 +5,13 @@ use warnings;
 
 use Test;
 
-eval {require Win32::Process::Info};
-$@ and do {
+my $dad;
+eval { $dad = getppid(); 1 } or do {
+    print "1..0 # Skip getppid() not implemented, or failed\n";
+    exit;
+};
+
+eval { require Win32::Process::Info; 1 } or do {
     print "1..0 # Skip unable to load Win32::Process::Info\n";
     exit;
 };
@@ -14,12 +19,6 @@ Win32::Process::Info->import();
 
 my $pi = Win32::Process::Info->new(undef, 'NT,PT') or do {
     print "1..0 # Skip unable to instantiate Win32::Process::Info\n";
-    exit;
-};
-
-my $dad;
-eval { $dad = getppid(); 1 } or do {
-    print "1..0 # Skip getppid() not implemented, or failed\n";
     exit;
 };
 
