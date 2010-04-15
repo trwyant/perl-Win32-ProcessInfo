@@ -73,7 +73,6 @@ our $VERSION = '1.014';
 use Carp;
 use File::Spec;
 use Time::Local;
-use UNIVERSAL qw{isa};
 
 our %static = (
     elapsed_in_seconds	=> 1,
@@ -167,13 +166,15 @@ return 1;
 our %mutator = (
     elapsed_in_seconds	=> sub {$_[2]},
     variant		=> sub {
-	croak "Error - Variant can not be set on an instance."
-	    if isa ($_[0], 'Win32::Process::Info');
+	ref $_[0]
+	    and eval { $_[0]->isa( 'Win32::Process::Info' ) }
+	    or croak 'Error - Variant can not be set on an instance';
 	foreach (split '\W+', $_[2]) {
 	    _check_variant ($_);
-	    }
-	$_[2]},
-    );
+	}
+	$_[2]
+    },
+);
 
 
 =item $pi = Win32::Process::Info->new ([machine], [variant], [hash])
