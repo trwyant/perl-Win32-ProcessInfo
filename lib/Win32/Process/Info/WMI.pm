@@ -32,12 +32,11 @@ The following methods should be considered public:
 
 package Win32::Process::Info::WMI;
 
-use base qw{Win32::Process::Info};
-use vars qw{$VERSION};
-$VERSION = '1.004';
-
 use strict;
 use warnings;
+
+use base qw{Win32::Process::Info};
+our $VERSION = '1.015';
 
 use vars qw{%mutator};
 use Carp;

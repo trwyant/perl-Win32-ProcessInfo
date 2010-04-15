@@ -1,3 +1,19 @@
+1.015	15-Apr-2010	T. R. Wyant
+  Use eval { $invocant->isa( ... ) } instead of isa( $invocant, ... ),
+    since the latter is deprecated under Perl 5.12.
+  Document the need for an explicit import() in the NOTICE section of
+    the Win32::Process::Info POD. Provide an explicit error message to
+    this effect in new() if import() has in fact not been called.
+    Thanks to Piotr Lewandowski for reporting this omission.
+  Move change history to the Changes file.
+  Convert to the CPAN-recommended license.
+  Author-only tests are now run by the authortest Module::Build target.
+    They are unavailable under ExtUtils::MakeMaker.
+  Various tweaks for ReactOS. The NT variant appears to work under
+    0.3.11, except that it can not retrieve the process owner.
+  Do not require Module::Build for configuration, since MakeMaker is
+    also supported.
+
 1.014	06-Apr-2009	T. R. Wyant
   Missed change when replacing @_ with @args. Thanks to Erik Weidel for
     spotting this. Why the test suite worked for me I haven't a clue.

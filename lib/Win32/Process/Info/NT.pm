@@ -75,7 +75,7 @@ return undef;	## no critic (ProhibitExplicitReturnUndef)
 
 use base qw{Win32::Process::Info};
 
-our $VERSION = '1.007';
+our $VERSION = '1.015';
 
 our $AdjustTokenPrivileges;
 our $CloseHandle;
