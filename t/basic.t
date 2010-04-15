@@ -88,8 +88,8 @@ my $loaded;
 BEGIN {
     $| = 1;	## no critic (RequireLocalizedPunctuationVars)
     my @todo;
-    $reactos and push @todo, 9;
-    plan ( tests => 23, todo => \@todo );
+    $reactos and push @todo, 10;
+    plan ( tests => 26, todo => \@todo );
     print "# Test 1 - Loading the library.\n"
 }
 END {print "not ok 1\n" unless $loaded;}
@@ -116,6 +116,11 @@ foreach my $variant (qw{NT WMI PT}) {
     skip ($skip, $pi);
     ($pi || $skip)
 	or $skip = "Skip Can't instatiate $variant variant";
+
+
+    $test_num++;
+    print "# Test $test_num - Ask for elapsed time in seconds.\n";
+    skip( $skip, eval { $pi->Set( elapsed_in_seconds => 1 ) } );
 
 
     $test_num++;

@@ -63,19 +63,19 @@ The following methods should be considered public:
 
 package Win32::Process::Info;
 
+use 5.006;
+
 use strict;
 use warnings;
 
 our $VERSION = '1.014';
-
-use vars qw{%mutator %static};
 
 use Carp;
 use File::Spec;
 use Time::Local;
 use UNIVERSAL qw{isa};
 
-%static = (
+our %static = (
     elapsed_in_seconds	=> 1,
     variant		=> $ENV{PERL_WIN32_PROCESS_INFO_VARIANT},
     );
@@ -164,7 +164,7 @@ croak "Error - Variant '$variant' is unsupported on your configuration. $variant
 return 1;
 }
 
-%mutator = (
+our %mutator = (
     elapsed_in_seconds	=> sub {$_[2]},
     variant		=> sub {
 	croak "Error - Variant can not be set on an instance."
