@@ -14,7 +14,6 @@ MANIFEST			This list of files
 META.yml
 README
 t/basic.t
-t/sub.t
 xt/critic.t
 xt/executable.t
 xt/manifest.t

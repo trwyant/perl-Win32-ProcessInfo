@@ -12,6 +12,7 @@ CVS/
 \.old$
 \.svn/
 \.swp$
+^t/sub\.t$
 \.tar\.gz$
 ^TODO$
 ^USED_BY$
