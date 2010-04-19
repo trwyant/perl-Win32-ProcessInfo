@@ -68,7 +68,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.015';
+our $VERSION = '1.016';
 
 use Carp;
 use File::Spec;
