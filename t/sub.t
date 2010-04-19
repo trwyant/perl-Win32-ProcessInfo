@@ -11,13 +11,16 @@ eval { $dad = getppid(); 1 } or do {
     exit;
 };
 
-eval { require Win32::Process::Info; 1 } or do {
+eval {
+    require Win32::Process::Info;
+    Win32::Process::Info->import();
+    1
+} or do {
     print "1..0 # Skip unable to load Win32::Process::Info\n";
     exit;
 };
-Win32::Process::Info->import();
 
-my $pi = Win32::Process::Info->new(undef, 'NT,PT') or do {
+my $pi = eval { Win32::Process::Info->new(undef, 'WMI,PT') } or do {
     print "1..0 # Skip unable to instantiate Win32::Process::Info\n";
     exit;
 };
