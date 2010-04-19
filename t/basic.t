@@ -82,7 +82,7 @@ my $test_num = 1;
 
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-# Note - number of tests is 2 (load and version) + 7 * number of variants
+# Note - number of tests is 2 (load and version) + 8 * number of variants
 
 my $loaded;
 BEGIN {
