@@ -142,7 +142,7 @@ DLL_LOOP:
 	    check_support => sub {
 		local $@;
 		_isReactOS()
-		    or return 'Unsupported under ReactOS';
+		    and return 'Unsupported under ReactOS';
 		eval {
 		    require Win32::OLE;
 		    1;
