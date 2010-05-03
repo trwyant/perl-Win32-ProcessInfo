@@ -848,10 +848,9 @@ load this module as
 The problem is that fork() and Win32::OLE (used by the WMI variant) do
 not play B<at all> nicely together. This appears to be an acknowledged
 problem with Win32::OLE, which is brought on simply by loading the
-module. See import() above for the consequences of handling things this
-way.
+module. See import() above for the gory details.
 
-The use of the NT and WMI variants under non-windows systems is
+The use of the NT and WMI variants under non-Microsoft systems is
 unsupported. ReactOS 0.3.3 is known to lock up when GetProcInfo() is
 called; since this  works on the Microsoft OSes, I am inclined to
 attribute this to the acknowledged alpha-ness of ReactOS. I have no idea
@@ -862,9 +861,13 @@ L<http://rt.cpan.org>.
 
 =head1 RESTRICTIONS
 
-You can not "require" this library except in a BEGIN block. This is a
-consequence of the use of Win32::API, which has the same restriction,
-at least in some versions.
+You can not C<require> this module except in a BEGIN block. This is a
+consequence of the use of Win32::API, which has the same restriction, at
+least in some versions.
+
+If you C<require> this module, you B<must> explicitly call C<<
+Win32::Process::Info->import() >>, so that the module will know what
+variants are available.
 
 If your code calls fork (), you must load this module as
 
