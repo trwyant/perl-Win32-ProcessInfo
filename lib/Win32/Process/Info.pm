@@ -10,8 +10,10 @@ Win32::Process::Info - Provide process information for Windows 32 systems.
  @pids = $pi->ListPids ();	# Get all known PIDs
  @info = $pi->GetProcInfo ();	# Get the max
  %subs = $pi->Subprocesses ();	# Figure out subprocess relationships.
- @info = grep {$_->{Name} =~ m/perl/}
-    $pi->GetProcInfo ();        # All processes with 'perl' in name.
+ @info = grep {
+     defined $_->{Name} &&
+     $_->{Name} =~ m/perl/
+ } $pi->GetProcInfo ();        # All processes with 'perl' in name.
 
 =head1 NOTICE
 
