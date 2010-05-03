@@ -6,111 +6,37 @@ use warnings;
 use File::Spec;
 use Test;
 
-my ($proc, $wmi);
-my $my_user = getlogin || getpwuid ($<);
-my $nt_skip;
-my $reactos;
-BEGIN {
-    $nt_skip = 'NT-Family OS required.';
-    $reactos = $^O eq 'MSWin32' && lc $ENV{OS} eq 'reactos';
-    eval {
-	require Win32;
+my $my_user = eval { getlogin || getpwuid ($<) };
+my $reactos = $^O eq 'MSWin32' && lc $ENV{OS} eq 'reactos';
 
-	if ($reactos) {
-	    $wmi = undef;	# WMI does not work under ReactOS,
-				# at least as of 0.3.10
-	} elsif (eval {require Win32::OLE; 1}) {
-	    my $old_warn = Win32::OLE->Option ('Warn');	# Sure wish I could localize this baby.
-	    Win32::OLE->Option (Warn => 0);
-	    $wmi = Win32::OLE->GetObject ('winmgmts:{impersonationLevel=impersonate,(Debug)}!//./root/cimv2');
-	    $proc = $wmi->Get ("Win32_Process='$$'") if $wmi;
-	    $wmi = undef unless $wmi && $proc;
-	    Win32::OLE->Option (Warn => $old_warn);
-	}
-
-#	Figure out whether we support the NT variant.
-
-	$nt_skip = Win32::IsWinNT () ? eval {require Win32::API} ? 0 :
-	    "Skip Win32::API not installed." :
-	    "Skip Windows NT-family OS required.";
-	my @path = split ';', $ENV{Path};
-	unless ($nt_skip) {
-	DLL_LOOP:
-	    foreach my $dll (qw{PSAPI.DLL ADVAPI32.DLL KERNEL32.DLL}) {
-		foreach my $loc (@path) {
-		    next DLL_LOOP if -e File::Spec->catfile ($loc, $dll);
-		}
-		$nt_skip = "Skip $dll not found.";
-		last;
-	    }
-	}
-    };
-###    $@ and do {chomp $@; print "# Information - Windows check exception: $@\n"};
-}
-
-# OK, we've checked all the "external" causes of failure for the NT
-# variant that I can think of.
-
-local $ENV{PERL_WIN32_PROCESS_INFO_WMI_DEBUG_PRIV} = '';
-local $ENV{PERL_WIN32_PROCESS_INFO_WMI_PARIAH} = '';
-
-print "# Information - WMI object = ", defined $wmi ? "'$wmi'\n" : "undefined\n";
-print "# Information - WMI process object = ", defined $proc ? "'$proc'\n" : "undefined\n";
-## print "# Win32::OLE->LastError = @{[Win32::OLE->LastError () || 'none']}\n";
-
-my %skip = (
-    NT	=> $nt_skip,
-    WMI	=> ($wmi ? 0 : "Skip WMI required."),
-    );
-
-eval {require Proc::ProcessTable};
-$skip{PT} = $@ ? "Unable to load Proc::ProcessTable" : 0;
-
-$ENV{PERL_WIN32_PROCESS_INFO_VARIANT} and do {
-    my %var = map {($_, 1)} split ',', uc $ENV{PERL_WIN32_PROCESS_INFO_VARIANT};
-    foreach (keys %skip) {
-	$skip{$_} ||= 'Skip not in $ENV{PERL_WIN32_PROCESS_INFO_VARIANT}'
-	    unless $var{$_};
-	}
-    };
-
-foreach (@ARGV) {$skip{$_} = "Skip user request" unless $skip{$_}}
+# Note - number of tests is 2 (load and version) + 10 * number of variants
+my @todo;
+$reactos and push @todo, 10;
+plan( tests => 32, todo => \@todo );
 
 my $test_num = 1;
 
-################### We start with some black magic to print on failure.
+print '# Test ', $test_num++, " - require Win32::Process::Info\n";
+my $loaded = eval {
+    require Win32::Process::Info;
+    Win32::Process::Info->import();
+    1;
+};
+ok( $loaded );
+$loaded or do {
+    print "Bail out!  Unable to require Win32::Process::Info\n";
+    exit 255;
+};
 
-# (It may become useful if the test is moved to ./t subdirectory.)
-
-# Note - number of tests is 2 (load and version) + 8 * number of variants
-
-my $loaded;
-BEGIN {
-    $| = 1;	## no critic (RequireLocalizedPunctuationVars)
-    my @todo;
-    $reactos and push @todo, 10;
-    plan ( tests => 26, todo => \@todo );
-    print "# Test 1 - Loading the library.\n"
-}
-END {print "not ok 1\n" unless $loaded;}
-use Win32::Process::Info;
-$loaded = 1;
-ok ($loaded);
-
-######################### End of black magic.
-
-$test_num++;
-print "# Test $test_num - See if we can get our version.\n";
+print '# Test ', $test_num++, " - Get our version\n";
 ok (Win32::Process::Info::Version () eq $Win32::Process::Info::VERSION);
-
 
 foreach my $variant (qw{NT WMI PT}) {
 
-    my $skip = $skip{$variant};
+    my $skip = Win32::Process::Info->variant_support_status( $variant );
     print "# Testing variant $variant. Skip = '$skip'\n";
 
-    $test_num++;
-    print "# Test $test_num - Instantiating the $variant variant.\n";
+    print '# Test ', $test_num++, " - Instantiating the $variant variant\n";
     my $pi;
     $skip or $pi = Win32::Process::Info->new (undef, $variant);
     skip ($skip, $pi);
@@ -118,50 +44,78 @@ foreach my $variant (qw{NT WMI PT}) {
 	or $skip = "Skip Can't instatiate $variant variant";
 
 
-    $test_num++;
-    print "# Test $test_num - Ask for elapsed time in seconds.\n";
-    skip( $skip, eval { $pi->Set( elapsed_in_seconds => 1 ) } );
+    print '# Test ', $test_num++, " - Ask for elapsed time in seconds.\n";
+    skip( $skip, $skip || eval { $pi->Set( elapsed_in_seconds => 1 ) } );
 
 
-    $test_num++;
-    print "# Test $test_num - Ability to list processes.\n";
+    print '# Test ', $test_num++, " - Ability to list processes.\n";
     my @pids;
     $skip or @pids = $pi->ListPids ();
     skip ($skip, scalar @pids);
 
 
-    $test_num++;
-    print "# Test $test_num - Our own PID should be in the list.\n";
+    print '# Test ', $test_num++, " - Our own PID should be in the list.\n";
     my @mypid = grep {$$ eq $_} @pids;
     skip ($skip, scalar @mypid);
 
 
-    $test_num++;
-    print "# Test $test_num - Ability to get process info.\n";
+    print '# Test ', $test_num++, " - Ability to get process info.\n";
     my @pinf;
     $skip or @pinf = $pi->GetProcInfo ();
     skip ($skip, scalar @pinf);
 
 
-    $test_num++;
-    print "# Test $test_num - Ability to get our own info.\n";
+    print '# Test ', $test_num++, " - Ability to get our own info.\n";
     my $me;
     $skip or ($me) = $pi->GetProcInfo ($$);
     skip ($skip, $me);
 
 
-    $test_num++;
-    print "# Test $test_num - Our own process should be running Perl.\n";
+    print '# Test ', $test_num++, " - Our own process should be running Perl.\n";
     skip ($skip, $me->{Name}, qr{(?i:perl)});
 
 
-    $test_num++;
-    print "# Test $test_num - Our own process should be under our username.\n";
+    print '# Test ', $test_num++, " - Our own process should be under our username.\n";
     my ($domain, $user) = $skip || !$me->{Owner} ? ('', '') :
 	split '\\\\', $me->{Owner};
     skip ($skip || (defined $my_user ? undef :
 	    "Can not determine username under $^O"),
 	defined $my_user && $user eq $my_user);
+
+
+    {
+	my $dad = '<unsupported>';
+	my $skip_sub = (
+	    eval { $dad = getppid(); 1 } ? 0 :
+	    'getppid not implemented or broken'
+	) || (
+	    'NT' eq $variant ? 'Subprocesses not supported by NT variant' : 0
+	);
+	$skip and $skip_sub = $skip;
+
+	print '# Test ', $test_num++, " - Call Subprocesses ",
+	    "and see if $$ is a subprocess of $dad\n";
+	my %subs = $skip_sub ? () : $pi->Subprocesses( $dad );
+	skip( $skip_sub, $subs{$$} );
+
+	print '# Test ', $test_num++, " - Call SubProcInfo ",
+	    "and see if $$ is a subprocess of $dad\n";
+	my ($pop) = $skip_sub ? { subProcesses => [] } : $pi->SubProcInfo($dad);
+	my @subs = @{$pop->{subProcesses}};
+	my $bingo;
+	while (@subs) {
+	    my $proc = shift @subs;
+	    $proc->{ProcessId} == $$ and do {
+		$bingo++;
+		last;
+	    };
+	    push @subs, @{$proc->{subProcesses}};
+	}
+	skip( $skip_sub, $bingo );
+
+    }
+
+
 }
 
 1;
