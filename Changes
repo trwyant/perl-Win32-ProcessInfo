@@ -1,3 +1,19 @@
+1.016_01	03-Feb-2011	T. R. Wyant
+  Add Win32::Process::Info->variant_support_status( $variant ), which
+    returns false if the variant is supported, and a message if not.
+    Re-implement in terms of this.
+  Make support check for WMI variant like that in t/basic.t, which is
+    more comprehensive.
+  Correct check for ReactOS.
+  Merge subprocess check into t/basic.t.
+  Correct SYNOPSIS code to handle an undefined process name. Thanks to
+    'fleg' for reporting this on annocpan.
+  Document the need for an explicit import() after loading via 'require'
+    rather than 'use'.
+  When checking for support of the NT variant, use File::Spec->path() to
+    dissect the path, rather than doing it by hand, since my code did
+    not work under Cygwin, and File::Spec was already required.
+
 1.016	18-Apr-2010	T. R. Wyant
   Retract test t/sub.t while I rethink how tests work.
 
