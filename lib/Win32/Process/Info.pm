@@ -111,7 +111,7 @@ BEGIN {
 		} or return "$^O is not a member of the Windows NT family";
 		eval { require Win32::API; 1 }
 		    or return 'I can not find Win32::API';
-		my @path = split ';', $ENV{Path};
+		my @path = File::Spec->path();
 DLL_LOOP:
 		foreach my $dll (qw{PSAPI.DLL ADVAPI32.DLL KERNEL32.DLL}) {
 		    foreach my $loc (@path) {
