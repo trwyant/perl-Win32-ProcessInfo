@@ -24,7 +24,7 @@ my %args = (
 
 $mmv >= 6.31 and $args{LICENSE} = 'perl';
 
-$mmv >= 6.4501 and $attr{META_ADD} = {
+$mmv >= 6.4501 and $args{META_ADD} = {
     no_index => {
 	directory => [ qw{ inc t xt } ],
     },
