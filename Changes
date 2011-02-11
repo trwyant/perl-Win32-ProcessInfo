@@ -1,3 +1,7 @@
+1.016_02	10-Feb-2011	T. R. Wyant
+  Correct fatal typo in Makefile.PL.
+  Move author tests from xt/ to xt/author/.
+
 1.016_01	03-Feb-2011	T. R. Wyant
   Add Win32::Process::Info->variant_support_status( $variant ), which
     returns false if the variant is supported, and a message if not.

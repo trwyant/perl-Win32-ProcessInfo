@@ -70,7 +70,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.016_01';
+our $VERSION = '1.016_02';
 
 use Carp;
 use File::Spec;
