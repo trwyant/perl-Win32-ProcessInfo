@@ -1,3 +1,7 @@
+1.018		01-May-2011	T. R. Wyant
+  Fix uninitialized value warnings in Win32::Process::Info::PT under
+    Perl 5.14.0-RC1.
+
 1.017		16-Feb-2011	T. R. Wyant
   No changes other than version from 1.016_02.
 
