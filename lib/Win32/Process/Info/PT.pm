@@ -186,7 +186,7 @@ to be consistent with the other variants.
 	    $info->{Owner} = $pw_uid{$uid} ||= '\\' . getpwuid($uid);
 	},
     );
-    my @fld_sup = Proc::ProcessTable->new ()->fields ();
+    my @fld_sup = grep { defined $_ } Proc::ProcessTable->new ()->fields ();
 
     sub GetProcInfo {
 	my ($self, @args) = @_;
