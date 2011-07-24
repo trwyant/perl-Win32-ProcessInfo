@@ -24,6 +24,7 @@ Aldo
 Amine
 API
 APIs
+Bowes
 Calpini
 DLL
 ExecutablePath
@@ -31,6 +32,7 @@ Faylor
 GetProcInfo
 GetProcInfo's
 IDs
+infinitum
 ISBN
 Jenda
 Jutta
@@ -38,6 +40,7 @@ Klebe
 Krynicky
 LibWin
 MaximumWorkingSetSize
+merchantability
 MinimumWorkingSetSize
 Moulay
 NT
@@ -45,7 +48,9 @@ NT's
 NtQuerySystemInformation
 Nemours
 OSes
+pathname
 PIDs
+Pitney
 PPM
 PT
 ParentProcessId
@@ -56,13 +61,8 @@ Ramdane
 ReactOS
 Roth
 SID
+subclasses
 SubProcInfo
-Urist
-Urist's
-VCC
-Winternl
-WMI
-Wyant
 cc
 clunks
 de
@@ -78,7 +78,13 @@ psapi
 pulist
 retrofitted
 stime
+Urist
+Urist's
+VCC
 username
 winpid
 winppid
+Winternl
+WMI
+Wyant
 xs
