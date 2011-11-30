@@ -514,7 +514,8 @@ passing any necessary arguments.
 
 
 {
-    my $is_reactos = $^O eq 'MSWin32' && lc $ENV{OS} eq 'reactos';
+    my $is_reactos = $^O eq 'MSWin32' &&
+	defined $ENV{OS} && lc $ENV{OS} eq 'reactos';
     sub _isReactOS {
 	return $is_reactos;
     }

@@ -7,7 +7,8 @@ use File::Spec;
 use Test;
 
 my $my_user = eval { getlogin || getpwuid ($<) };
-my $reactos = $^O eq 'MSWin32' && lc $ENV{OS} eq 'reactos';
+my $reactos = $^O eq 'MSWin32'
+    && defined $ENV{OS} && lc $ENV{OS} eq 'reactos';
 
 # Note - number of tests is 2 (load and version) + 10 * number of variants
 my @todo;
