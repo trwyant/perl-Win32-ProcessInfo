@@ -33,6 +33,11 @@ sub requires {
 ##  if ( ! $self->distribution() ) {
 ##  }
     return {
+	'strict'	=> 0,
+	'warnings'	=> 0,
+	'Carp'		=> 0,
+	'File::Spec'	=> 0,
+	'Time::Local'	=> 0,
 	@extra,
     };
 }
