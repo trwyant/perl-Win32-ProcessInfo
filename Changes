@@ -1,3 +1,14 @@
+1.018_90	03-Dec-2011	T. R. Wyant
+  Correct test for ReactOS -- it appears $ENV{OS} can not be relied on
+    to be defined in all Windows systems. Thanks to Marc Bilodeau for
+    finding this in his Apache logs.
+  Redo most tests in terms of Test::More 0.88, and require this for
+    build.
+  Get serious about dependencies, including core modules.
+  Update copy of GNU GPL in LICENSES/Copying to have current FSF
+    address.
+  Revise copyright statement in README.
+
 1.018		01-May-2011	T. R. Wyant
   Fix uninitialized value warnings in Win32::Process::Info::PT under
     Perl 5.14.0-RC1.

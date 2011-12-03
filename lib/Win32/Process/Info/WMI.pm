@@ -36,7 +36,7 @@ use strict;
 use warnings;
 
 use base qw{Win32::Process::Info};
-our $VERSION = '1.018';
+our $VERSION = '1.018_90';
 
 use vars qw{%mutator};
 use Carp;
