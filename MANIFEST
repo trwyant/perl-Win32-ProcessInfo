@@ -3,6 +3,7 @@ Changes
 eg/ProcessInfo.pl
 eg/README
 inc/My/Module/Build.pm
+inc/My/Module/Meta.pm
 lib/Win32/Process/Info.pm
 lib/Win32/Process/Info/NT.pm
 lib/Win32/Process/Info/PT.pm
@@ -17,6 +18,7 @@ t/basic.t
 xt/author/critic.t
 xt/author/executable.t
 xt/author/manifest.t
+xt/author/kwalitee.t
 xt/author/perlcriticrc
 xt/author/pod.t
 xt/author/pod_coverage.t

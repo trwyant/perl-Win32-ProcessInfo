@@ -3,50 +3,38 @@ package main;
 use strict;
 use warnings;
 
-use Test;
+use Test::More 0.88;
+
+use Win32::Process::Info;
 
 my $dad;
-eval { $dad = getppid(); 1 } or do {
-    print "1..0 # Skip getppid() not implemented, or failed\n";
-    exit;
-};
-
 eval {
-    require Win32::Process::Info;
-    Win32::Process::Info->import();
-    1
+    $dad = getppid();
+    1;
 } or do {
-    print "1..0 # Skip unable to load Win32::Process::Info\n";
+    plan skip_all => 'getppid() not implemented, or failed';
     exit;
 };
 
-my $pi = eval { Win32::Process::Info->new(undef, 'WMI,PT') } or do {
-    print "1..0 # Skip unable to instantiate Win32::Process::Info\n";
+my $pi = eval {
+    Win32::Process::Info->new(undef, 'WMI,PT')
+} or do {
+    plan skip_all => 'unable to instantiate Win32::Process::Info';
     exit;
 };
 
-plan (tests => 2);
+note <<"EOD";
 
-print <<eod;
-#
-#	My process ID = $$
-#	Parent process id = $dad
-eod
+My process ID = $$
+Parent process ID = $dad
+EOD
 
 {
-    print <<eod;
-#
-# Test 1: Call Subprocesses() and see if $$ is a subprocess of $dad
-eod
     my %subs = $pi->Subprocesses($dad);
-    ok ($subs{$$});
+    ok $subs{$$}, "Call Subprocesses() and see if $$ is a subprocess of $dad";
 }
 
 {
-    print <<eod;
-#
-# Test 2: Call SubProcInfo() and see if $$ is a subprocess of $dad
-eod
     my ($pop) = $pi->SubProcInfo($dad);
     my @subs = @{$pop->{subProcesses}};
     my $bingo;
@@ -58,7 +46,13 @@ eod
 	};
 	push @subs, @{$proc->{subProcesses}};
     }
-    ok ($bingo);
+    ok $bingo, "Call SubProcInfo() and see if $$ is a subprocess of $dad";
 }
 
+done_testing;
+
 1;
+
+__END__
+
+# ex: set textwidth=72 :
