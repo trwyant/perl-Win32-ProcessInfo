@@ -1,5 +1,5 @@
 1.019		28-Dec-2011	T. R. Wyant
-  No changes from 0.018_90 other than version.
+  No changes from 1.018_90 other than version.
 
 1.018_90	03-Dec-2011	T. R. Wyant
   Correct test for ReactOS -- it appears $ENV{OS} can not be relied on
