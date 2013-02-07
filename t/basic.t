@@ -1,4 +1,3 @@
-#! perl
 package main;
 
 use strict;
