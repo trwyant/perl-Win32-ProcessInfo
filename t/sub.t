@@ -5,11 +5,13 @@ use warnings;
 
 use Test::More 0.88;
 
-use Win32::Process::Info;
+use Win32::Process::Info qw{ $MY_PID };
 
 my $dad;
 eval {
     $dad = getppid();
+    $^O eq 'cygwin'
+	and $dad = Cygwin::pid_to_winpid( $dad );
     1;
 } or do {
     plan skip_all => 'getppid() not implemented, or failed';
@@ -25,13 +27,14 @@ my $pi = eval {
 
 note <<"EOD";
 
-My process ID = $$
+My process ID = $MY_PID
 Parent process ID = $dad
 EOD
 
 {
     my %subs = $pi->Subprocesses($dad);
-    ok $subs{$$}, "Call Subprocesses() and see if $$ is a subprocess of $dad";
+    ok $subs{$MY_PID},
+	"Call Subprocesses() and see if $MY_PID is a subprocess of $dad";
 }
 
 {
@@ -40,13 +43,14 @@ EOD
     my $bingo;
     while (@subs) {
 	my $proc = shift @subs;
-	$proc->{ProcessId} == $$ and do {
+	$proc->{ProcessId} == $MY_PID and do {
 	    $bingo++;
 	    last;
 	};
 	push @subs, @{$proc->{subProcesses}};
     }
-    ok $bingo, "Call SubProcInfo() and see if $$ is a subprocess of $dad";
+    ok $bingo,
+	"Call SubProcInfo() and see if $MY_PID is a subprocess of $dad";
 }
 
 done_testing;

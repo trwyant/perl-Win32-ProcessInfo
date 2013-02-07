@@ -35,7 +35,8 @@ package Win32::Process::Info::WMI;
 use strict;
 use warnings;
 
-use base qw{Win32::Process::Info};
+use base qw{ Win32::Process::Info };
+
 our $VERSION = '1.019';
 
 use vars qw{%mutator};
@@ -44,6 +45,7 @@ use Time::Local;
 use Win32::OLE qw{in with};
 use Win32::OLE::Const;
 use Win32::OLE::Variant;
+use Win32::Process::Info qw{ $MY_PID };
 
 
 %mutator = %Win32::Procecss::Info::mutator;
@@ -210,7 +212,7 @@ sub _get_proc_objects {
 my $self = shift;
 my @procs = @_ ?
     map {
-	my $pi = $_ eq '.' ? $$ : $_;
+	my $pi = $_ eq '.' ? $MY_PID : $_;
 	my $obj = $self->{wmi}->Get ("Win32_Process='$pi'");
 	Win32::OLE->LastError ? () : ($obj)	
 	} @_ :

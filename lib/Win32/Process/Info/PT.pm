@@ -63,12 +63,14 @@ package Win32::Process::Info::PT;
 use strict;
 use warnings;
 
-use base qw{Win32::Process::Info};
+use base qw{ Win32::Process::Info };
+
 our $VERSION = '1.019';
 
 use Carp;
 use File::Basename;
 use Proc::ProcessTable;
+use Win32::Process::Info qw{ $MY_PID };
 
 # TODO figure out what we need to do here.
 
@@ -193,7 +195,9 @@ to be consistent with the other variants.
 	my $opt = ref $args[0] eq 'HASH' ? shift @args : {};
 	my $tbl = Proc::ProcessTable->new ()->table ();
 	if (@args) {
-	    my %filter = map {(($_ eq '.' ? $$ : $_), 1)} @args;
+	    my %filter = map {
+		($_ eq '.' ? $MY_PID : $_) => 1
+	    } @args;
 	    $tbl = [grep {$filter{$_->pid ()}} @$tbl];
 	}
 	my @pinf;
@@ -232,7 +236,9 @@ sub ListPids {
     my $tbl = Proc::ProcessTable->new ()->table ();
     my @pids;
     if (@args) {
-	my %filter = map {(($_ eq '.' ? $$ : $_), 1)} @args;
+	my %filter = map {
+	    ($_ eq '.' ? $MY_PID : $_) => 1
+	} @args;
 	@pids = grep {$filter{$_}} map {$_->pid} @$tbl;
     } else {
 	@pids = map {$_->pid} @$tbl;

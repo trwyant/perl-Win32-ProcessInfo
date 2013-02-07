@@ -73,8 +73,11 @@ use warnings;
 our $VERSION = '1.019';
 
 use Carp;
+use Exporter ();
 use File::Spec;
 use Time::Local;
+
+our @EXPORT_OK = qw{ $MY_PID };
 
 our %static = (
     elapsed_in_seconds	=> 1,
@@ -100,7 +103,16 @@ our %static = (
 #	a variant checker utility.
 
 my %variant_support;
+our $MY_PID;
 BEGIN {
+    # Cygwin has its own idea of what a process ID is, independent of
+    # the underlying operating system. The Cygwin Perl implements this,
+    # so if we're Cygwin we need to compensate.
+    if ( $^O eq 'cygwin' ) {
+	$MY_PID = Cygwin::pid_to_winpid( $$ );
+    } else {
+	*MY_PID = *$;
+    }
     %variant_support = (
 	NT => {
 	    check_support => sub {
@@ -156,7 +168,7 @@ DLL_LOOP:
 		    $wmi = Win32::OLE->GetObject(
 			'winmgmts:{impersonationLevel=impersonate,(Debug)}!//./root/cimv2'
 		    );
-		    $wmi and $proc = $wmi->Get( "Win32_Process='$$'" );
+		    $wmi and $proc = $wmi->Get( "Win32_Process='$MY_PID'" );
 		};
 		Win32::OLE->Option( Warn => $old_warn );
 		$wmi or return 'Unable to get WMI object';
@@ -480,7 +492,7 @@ passing any necessary arguments.
 
     my $idempotent;
 
-    sub import {
+    sub import {	## no critic (RequireArgUnpacking)
 	my ($pkg, @params) = @_;
 	my (@args, @vars);
 	foreach (@params) {
@@ -490,8 +502,7 @@ passing any necessary arguments.
 		push @args, $_;
 	    }
 	}
-	# Note that if we ever become a subclass of Exporter
-	# we will have to call __PACKAGE__->SUPER::import (@args);
+
 	if ($idempotent++) {
 	    # Warning here maybe?
 	} else {
@@ -502,7 +513,9 @@ passing any necessary arguments.
 		    $variant_support{$try}{check_support}->()} || $@;
 	    }
 	}
-	return;
+
+	@_ = ( $pkg, @args );
+	goto &Exporter::import;;
     }
 
     # Return the number of times import() done.
@@ -813,6 +826,25 @@ If present, should contain a semicolon-delimited list of process names
 for which the package should not attempt to get owner information. '*'
 is a special case meaning 'all'. You will probably need to use this if
 you assert PERL_WIN32_PROCESS_INFO_WMI_DEBUG.
+
+=head1 EXPORTS
+
+This module does not export anything by default. It does contain the
+following exportable items:
+
+=head2 $MY_PID
+
+This is used internally to try to deal with the fact that Cygwin process
+IDs are not necessarily the same as Windows process IDs. It should be
+considered experimental, and its behavior, or the variable itself, may
+be retracted. Use of this variable under any sort of forking is
+unsupported.
+
+Under Cygwin, C<$$> is the Cygwin process ID, but this module deals in
+Windows process IDs. C<$MY_PID> is a normal global variable, initialized
+to C<< Cygwin::pid_to_winpid( $$ ) >>.
+
+Under any other operating system, C<$MY_PID> is an alias for C<$$>.
 
 =head1 REQUIREMENTS
 
