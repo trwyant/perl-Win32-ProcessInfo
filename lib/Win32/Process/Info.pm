@@ -70,7 +70,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.019';
+our $VERSION = '1.019_01';
 
 use Carp;
 use Exporter ();

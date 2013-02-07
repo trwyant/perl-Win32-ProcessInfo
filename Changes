@@ -1,3 +1,11 @@
+1.019_01	2013-02-06	T. R. Wyant
+  Create new global variable $MY_PID, which is Cygwin::pid_to_winpid($$)
+    under Cygwin, and just $$ under everything else. Rewrite all uses of
+    $$ to $MY_PID. $MY_PID is documented as experimental, and (under
+    Cygwin) does not have the forking magic of $$.
+  Bring Changes file into compliance with Test::CPAN::Changes. Add
+    author test xt/author/changes.t to be sure it stays that way.
+
 1.019		2011-12-28	T. R. Wyant
   No changes from 1.018_90 other than version.
 
