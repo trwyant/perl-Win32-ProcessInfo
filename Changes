@@ -2,7 +2,9 @@
   Create new global variable $MY_PID, which is Cygwin::pid_to_winpid($$)
     under Cygwin, and just $$ under everything else. Rewrite all uses of
     $$ to $MY_PID. $MY_PID is documented as experimental, and (under
-    Cygwin) does not have the forking magic of $$.
+    Cygwin) does not have the forking magic of $$. Thanks to Mithun
+    Ayachit for letting me know about the $$ problem under Cygwin and
+    providing the solution.
   Bring Changes file into compliance with Test::CPAN::Changes. Add
     author test xt/author/changes.t to be sure it stays that way.
 
