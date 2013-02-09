@@ -77,7 +77,7 @@ use base qw{ Win32::Process::Info };
 
 use Win32::Process::Info qw{ $MY_PID };
 
-our $VERSION = '1.019_01';
+our $VERSION = '1.019_02';
 
 our $AdjustTokenPrivileges;
 our $CloseHandle;

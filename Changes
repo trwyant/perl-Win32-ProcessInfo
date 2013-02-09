@@ -1,3 +1,7 @@
+1.019_02	2013-02-09	T. R. Wyant
+  Try to fix occasional fatal error in NT variant where the SID is valid
+    but the attemot to fetch the authority fails.
+
 1.019_01	2013-02-06	T. R. Wyant
   Create new global variable $MY_PID, which is Cygwin::pid_to_winpid($$)
     under Cygwin, and just $$ under everything else. Rewrite all uses of
