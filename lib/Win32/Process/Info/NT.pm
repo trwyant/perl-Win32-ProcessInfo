@@ -585,6 +585,12 @@ confess 'Programming error - should not get here';
 #	appropriate size. A further unpack may be necessary to extract
 #	data from the finally-obtained structure. You'll be seeing a
 #	lot of this pack/unpack idiom in the code that follows.
+#
+#	Interestingly enough in February 2013 I found (fairly easily)
+#	ConvertSidToStringSid(), which seems to do what I need, and
+#	seems to have the same vintage as the other calls used above.
+#	But in September of 2002 when I was writing this code I never
+#	found it - certainly the docs cited never mentioned it.
 
 sub _text_sid {
 my $sid = shift;
@@ -603,7 +609,11 @@ $GetSidIdentifierAuthority ||=
 	_map ('ADVAPI32', 'GetSidIdentifierAuthority', [qw{P}], 'N');
 my $sia = $GetSidIdentifierAuthority->Call ($sid);
 $sia = pack 'L', $sia;
-$sia = unpack 'P6', $sia;
+# Occasionally we end up with an undef value here, which indicates a
+# failure. The docs say this only happens with an invalid SID, but what
+# do they know?
+defined( $sia = unpack 'P6', $sia )
+    or return;
 
 
 #	Get the number of subauthorities.
