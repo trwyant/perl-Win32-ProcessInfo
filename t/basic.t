@@ -36,40 +36,51 @@ foreach my $variant ( qw{ NT WMI PT } ) {
 
 	my $tests = 10;
 
+	my $prefix = "Variant $variant:";
+
 	my $skip = Win32::Process::Info->variant_support_status( $variant );
 	note "\nTesting variant $variant";
 	$skip
-	    and skip $skip, $tests;
+	    and skip "$prefix $skip", $tests;
 
 	my $pi = Win32::Process::Info->new (undef, $variant);
 	ok $pi, "Instantiate variant $variant."
 	    or skip "Failed to instantiate $variant", --$tests;
 
 	ok eval { $pi->Set( elapsed_in_seconds => 1 ) },
-	    'Ask for elapssed time in seconds.';
-
+	    "$prefix Ask for elapssed time in seconds";
 
 	my @pids = $pi->ListPids();
-	ok scalar @pids, 'Ability to list processes.';
+	ok scalar @pids, "$prefix Ability to list processes";
 
 	my @mypid = grep { $MY_PID eq $_ } @pids;
-	ok scalar @mypid, 'Our own PID should be in the list.';
+	ok scalar @mypid, "$prefix Our own PID should be in the list";
 
 
 	my @pinf = $pi->GetProcInfo();
-	ok scalar @pinf, 'Ability to get process info.';
+	ok scalar @pinf, "$prefix Ability to get process info";
 
 	my ( $me ) = $pi->GetProcInfo( $MY_PID );
-	ok $me, 'Ability to get our own info.';
+	ok $me, "$prefix Ability to get our own info";
 
-	like $me->{Name}, qr{ perl }smxi,
-	    'Our own process should be running Perl.';
+	SKIP: {
+	    defined $me
+		and defined $me->{Name}
+		or skip "$prefix Could not get process name", 1;
+
+	    like $me->{Name}, qr{ perl }smxi,
+		"$prefix Own process should be running Perl.";
+	}
 
 
 	SKIP: {
 
 	    defined $my_user
 		or skip "Can not determine username under $^O", 1;
+
+	    defined $me
+		and defined $me->{Owner}
+		or skip "$prefix Could not get process owner", 1;
 
 	    TODO: {
 		local $TODO;
@@ -78,7 +89,7 @@ foreach my $variant ( qw{ NT WMI PT } ) {
 
 		my ( $domain, $user ) = split qr{ \\ }smx, $me->{Owner};
 		is $user, $my_user,
-		    'Our own process should be under our username';
+		    "$prefix Our own process should be under our username";
 	    }
 	}
 
@@ -100,7 +111,7 @@ foreach my $variant ( qw{ NT WMI PT } ) {
 
 	    my %subs = $pi->Subprocesses( $dad );
 	    ok $subs{$MY_PID},
-		"Call Subprocesses() and see if $MY_PID is a subprocess of $dad";
+		"$prefix Call Subprocesses() and see if $MY_PID is a subprocess of $dad";
 
 	    my ( $pop ) = $pi->SubProcInfo( $dad );
 	    my @subs = @{ $pop->{subProcesses} };
@@ -115,7 +126,7 @@ foreach my $variant ( qw{ NT WMI PT } ) {
 		}
 	    }
 	    ok $subs{$MY_PID},
-		"Call SubProcInfo() and see if $MY_PID is a subprocess of $dad";
+		"$prefix Call SubProcInfo() and see if $MY_PID is a subprocess of $dad";
 
 	}
 
