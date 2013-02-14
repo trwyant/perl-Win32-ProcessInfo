@@ -73,11 +73,8 @@ use warnings;
 our $VERSION = '1.019_02';
 
 use Carp;
-use Exporter ();
 use File::Spec;
 use Time::Local;
-
-our @EXPORT_OK = qw{ $MY_PID };
 
 our %static = (
     elapsed_in_seconds	=> 1,
@@ -103,15 +100,21 @@ our %static = (
 #	a variant checker utility.
 
 my %variant_support;
-our $MY_PID;
 BEGIN {
     # Cygwin has its own idea of what a process ID is, independent of
     # the underlying operating system. The Cygwin Perl implements this,
-    # so if we're Cygwin we need to compensate.
+    # so if we're Cygwin we need to compensate. This MUST return the
+    # Windows-native form under Cygwin, which means any variant which
+    # needs another form must override.
+
     if ( $^O eq 'cygwin' ) {
-	$MY_PID = Cygwin::pid_to_winpid( $$ );
+	*My_Pid = sub {
+	    return Cygwin::pid_to_winpid( $$ );
+	};
     } else {
-	*MY_PID = *$;
+	*My_Pid = sub {
+	    return $$;
+	};
     }
     %variant_support = (
 	NT => {
@@ -168,7 +171,9 @@ DLL_LOOP:
 		    $wmi = Win32::OLE->GetObject(
 			'winmgmts:{impersonationLevel=impersonate,(Debug)}!//./root/cimv2'
 		    );
-		    $wmi and $proc = $wmi->Get( "Win32_Process='$MY_PID'" );
+		    $wmi and $proc = $wmi->Get(
+			sprintf q{Win32_Process='%s'}, __PACKAGE__->My_Pid()
+		    );
 		};
 		Win32::OLE->Option( Warn => $old_warn );
 		$wmi or return 'Unable to get WMI object';
@@ -514,8 +519,11 @@ passing any necessary arguments.
 	    }
 	}
 
-	@_ = ( $pkg, @args );
-	goto &Exporter::import;;
+	return;
+
+#	Do this if we become a subclass of Exporter
+#	@_ = ( $pkg, @args );
+#	goto &Exporter::import;;
     }
 
     # Return the number of times import() done.
@@ -643,6 +651,21 @@ sub SubProcInfo {
 	return @data;
     }
 }
+
+=item $pid = $pi->My_Pid()
+
+This convenience method returns the process ID of the current process,
+in a form appropriate to the operating system and the variant in use.
+Normally, it simply returns C<$$>. But Cygwin has its own idea of what
+the process ID is, which may differ from Windows. Worse than that, under
+Cygwin the NT and WMI variants return Windows PIDs, while PT appears to
+return Cygwin PIDs.
+
+=cut
+
+# This is defined above, trickily, as an assignment to *My_Pid, so we
+# don't have to test $^O every time. It's above because code in a BEGIN
+# block needs it.
 
 =item $text = Win32::Process::Info->variant_support_status($variant);
 
@@ -826,25 +849,6 @@ If present, should contain a semicolon-delimited list of process names
 for which the package should not attempt to get owner information. '*'
 is a special case meaning 'all'. You will probably need to use this if
 you assert PERL_WIN32_PROCESS_INFO_WMI_DEBUG.
-
-=head1 EXPORTS
-
-This module does not export anything by default. It does contain the
-following exportable items:
-
-=head2 $MY_PID
-
-This is used internally to try to deal with the fact that Cygwin process
-IDs are not necessarily the same as Windows process IDs. It should be
-considered experimental, and its behavior, or the variable itself, may
-be retracted. Use of this variable under any sort of forking is
-unsupported.
-
-Under Cygwin, C<$$> is the Cygwin process ID, but this module deals in
-Windows process IDs. C<$MY_PID> is a normal global variable, initialized
-to C<< Cygwin::pid_to_winpid( $$ ) >>.
-
-Under any other operating system, C<$MY_PID> is an alias for C<$$>.
 
 =head1 REQUIREMENTS
 

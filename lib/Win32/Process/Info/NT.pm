@@ -75,8 +75,6 @@ return undef;	## no critic (ProhibitExplicitReturnUndef)
 
 use base qw{ Win32::Process::Info };
 
-use Win32::Process::Info qw{ $MY_PID };
-
 our $VERSION = '1.019_02';
 
 our $AdjustTokenPrivileges;
@@ -345,13 +343,14 @@ my $tac = TOKEN_READ;
 my @pinf;
 
 my $dat;
+my $my_pid = $self->My_Pid();
 my %sid_to_name;
 my @trydac = (
     PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
     PROCESS_QUERY_INFORMATION,
     );
 
-foreach my $pid (map {$_ eq '.' ? $MY_PID : $_} @args) {
+foreach my $pid (map {$_ eq '.' ? $my_pid : $_} @args) {
 
     local $^E = 0;
     $dat = $self->_build_hash (undef, ProcessId => $pid);
@@ -529,8 +528,9 @@ reference to the list is returned.
 sub ListPids {
 my ( $self, @args ) = @_;
 my $filter = undef;
+my $my_pid = $self->My_Pid();
 @args and $filter = {
-    map { ($_ eq '.' ? $MY_PID : $_) => 1 } @args
+    map { ($_ eq '.' ? $my_pid : $_) => 1 } @args
 };
 $EnumProcesses ||= _map ('PSAPI', 'EnumProcesses', [qw{P N P}], 'I');
 my $psiz = 4;

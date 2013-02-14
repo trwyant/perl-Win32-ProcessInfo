@@ -19,14 +19,6 @@ eval {
     1;
 } or BAIL_OUT 'Win32::Process::Info->import() failed';
 
-# Pseudo-import symbol.
-our $MY_PID;
-{
-    no warnings qw{ once };
-    *MY_PID = *Win32::Process::Info::MY_PID;
-}
-# diag "\$\$ = $$; \$MY_PID = $MY_PID";
-
 is Win32::Process::Info::Version(), $Win32::Process::Info::VERSION,
     'Get our version';
 
@@ -50,17 +42,19 @@ foreach my $variant ( qw{ NT WMI PT } ) {
 	ok eval { $pi->Set( elapsed_in_seconds => 1 ) },
 	    "$prefix Ask for elapssed time in seconds";
 
+	my $my_pid = $pi->My_Pid();
+
 	my @pids = $pi->ListPids();
 	ok scalar @pids, "$prefix Ability to list processes";
 
-	my @mypid = grep { $MY_PID eq $_ } @pids;
+	my @mypid = grep { $my_pid eq $_ } @pids;
 	ok scalar @mypid, "$prefix Our own PID should be in the list";
 
 
 	my @pinf = $pi->GetProcInfo();
 	ok scalar @pinf, "$prefix Ability to get process info";
 
-	my ( $me ) = $pi->GetProcInfo( $MY_PID );
+	my ( $me ) = $pi->GetProcInfo( $my_pid );
 	ok $me, "$prefix Ability to get our own info";
 
 	SKIP: {
@@ -101,6 +95,7 @@ foreach my $variant ( qw{ NT WMI PT } ) {
 	    eval {
 		$dad = getppid;
 		$^O eq 'cygwin'
+		    and $variant ne 'PI'
 		    and $dad = Cygwin::pid_to_winpid( $dad );
 		1;
 	    } or skip 'getppid not implemented or broken', $skip_sub;
@@ -110,23 +105,23 @@ foreach my $variant ( qw{ NT WMI PT } ) {
 		    $skip_sub;
 
 	    my %subs = $pi->Subprocesses( $dad );
-	    ok $subs{$MY_PID},
-		"$prefix Call Subprocesses() and see if $MY_PID is a subprocess of $dad";
+	    ok $subs{$my_pid},
+		"$prefix Call Subprocesses() and see if $my_pid is a subprocess of $dad";
 
 	    my ( $pop ) = $pi->SubProcInfo( $dad );
 	    my @subs = @{ $pop->{subProcesses} };
 	    my $bingo;
 	    while ( @subs ) {
 		my $proc = shift @subs;
-		if ( $proc->{ProcessId} eq $MY_PID ) {
+		if ( $proc->{ProcessId} eq $my_pid ) {
 		    $bingo++;
 		    last;
 		} else {
 		    push @subs, @{ $proc->{subProcesses} };
 		}
 	    }
-	    ok $subs{$MY_PID},
-		"$prefix Call SubProcInfo() and see if $MY_PID is a subprocess of $dad";
+	    ok $subs{$my_pid},
+		"$prefix Call SubProcInfo() and see if $my_pid is a subprocess of $dad";
 
 	}
 

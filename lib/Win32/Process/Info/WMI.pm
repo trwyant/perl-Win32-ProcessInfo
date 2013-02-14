@@ -45,7 +45,6 @@ use Time::Local;
 use Win32::OLE qw{in with};
 use Win32::OLE::Const;
 use Win32::OLE::Variant;
-use Win32::Process::Info qw{ $MY_PID };
 
 
 %mutator = %Win32::Procecss::Info::mutator;
@@ -210,9 +209,10 @@ be present.
 
 sub _get_proc_objects {
 my $self = shift;
+my $my_pid = $self->My_Pid();
 my @procs = @_ ?
     map {
-	my $pi = $_ eq '.' ? $MY_PID : $_;
+	my $pi = $_ eq '.' ? $my_pid : $_;
 	my $obj = $self->{wmi}->Get ("Win32_Process='$pi'");
 	Win32::OLE->LastError ? () : ($obj)	
 	} @_ :

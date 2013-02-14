@@ -70,7 +70,6 @@ our $VERSION = '1.019_02';
 use Carp;
 use File::Basename;
 use Proc::ProcessTable;
-use Win32::Process::Info qw{ $MY_PID };
 
 # TODO figure out what we need to do here.
 
@@ -192,11 +191,14 @@ to be consistent with the other variants.
 
     sub GetProcInfo {
 	my ($self, @args) = @_;
+
+	my $my_pid = $self->My_Pid();
 	my $opt = ref $args[0] eq 'HASH' ? shift @args : {};
 	my $tbl = Proc::ProcessTable->new ()->table ();
+
 	if (@args) {
 	    my %filter = map {
-		($_ eq '.' ? $MY_PID : $_) => 1
+		($_ eq '.' ? $my_pid : $_) => 1
 	    } @args;
 	    $tbl = [grep {$filter{$_->pid ()}} @$tbl];
 	}
@@ -233,17 +235,24 @@ reference to the list is returned.
 
 sub ListPids {
     my ($self, @args) = @_;
+
     my $tbl = Proc::ProcessTable->new ()->table ();
+    my $my_pid = $self->My_Pid();
     my @pids;
+
     if (@args) {
 	my %filter = map {
-	    ($_ eq '.' ? $MY_PID : $_) => 1
+	    ($_ eq '.' ? $my_pid : $_) => 1
 	} @args;
 	@pids = grep {$filter{$_}} map {$_->pid} @$tbl;
     } else {
 	@pids = map {$_->pid} @$tbl;
     }
     return wantarray ? @pids : \@pids;
+}
+
+sub My_Pid {
+    return $$;
 }
 
 =back
