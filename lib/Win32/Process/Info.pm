@@ -50,6 +50,10 @@ information is convenient (for the author!) about one or more Windows
 32 processes. L</GetProcInfo> is therefore the most-important
 method in the package. See it for more information.
 
+The process IDs made available are those returned by the variant in
+use. See the documentation to the individual variants for details,
+especially if you are a Cygwin user.
+
 Unless explicitly stated otherwise, modules, variables, and so
 on are considered private. That is, the author reserves the right
 to make arbitrary changes in the way they work, without telling

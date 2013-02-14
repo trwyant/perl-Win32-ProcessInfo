@@ -28,10 +28,12 @@ only be called via that package.
 
 =head1 DESCRIPTION
 
-The main purpose of the Win32::Process::Info package is to get whatever
+The main purpose of the Win32::Process::Info::NT package is to get whatever
 information is convenient (for the author!) about one or more Windows
 32 processes. GetProcInfo (which see) is therefore the most-important
 subroutine in the package. See it for more information.
+
+This package returns Windows process IDs, even under Cygwin.
 
 Unless explicitly stated otherwise, modules, variables, and so
 on are considered private. That is, the author reserves the right

@@ -24,6 +24,8 @@ only be called via that package.
 This package implements the WMI-specific methods of
 Win32::Process::Info.
 
+This package returns Windows process IDs, even under Cygwin.
+
 The following methods should be considered public:
 
 =over 4
