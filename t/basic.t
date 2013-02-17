@@ -95,7 +95,7 @@ foreach my $variant ( qw{ NT WMI PT } ) {
 	    eval {
 		$dad = getppid;
 		$^O eq 'cygwin'
-		    and $variant ne 'PI'
+		    and $variant ne 'PT'
 		    and $dad = Cygwin::pid_to_winpid( $dad );
 		1;
 	    } or skip 'getppid not implemented or broken', $skip_sub;
@@ -109,7 +109,7 @@ foreach my $variant ( qw{ NT WMI PT } ) {
 		"$prefix Call Subprocesses() and see if $my_pid is a subprocess of $dad";
 
 	    my ( $pop ) = $pi->SubProcInfo( $dad );
-	    my @subs = @{ $pop->{subProcesses} };
+	    my @subs = @{ $pop->{subProcesses} || [] };
 	    my $bingo;
 	    while ( @subs ) {
 		my $proc = shift @subs;
