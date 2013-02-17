@@ -74,7 +74,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.019_03';
+our $VERSION = '1.019_04';
 
 use Carp;
 use File::Spec;

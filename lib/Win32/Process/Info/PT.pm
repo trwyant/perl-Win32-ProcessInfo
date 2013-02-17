@@ -69,7 +69,7 @@ use warnings;
 
 use base qw{ Win32::Process::Info };
 
-our $VERSION = '1.019_03';
+our $VERSION = '1.019_04';
 
 use Carp;
 use File::Basename;

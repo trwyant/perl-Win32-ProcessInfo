@@ -1,3 +1,6 @@
+1.019_04	2013-02-17	T. R. Wyant
+  Fix problem with testing 'PT' variant in t/basic.t under Cygwin.
+
 1.019_03	2013-02-14	T. R. Wyant
   Introduce the My_Pid() method. The base method returns $$ except under
     Cygwin, where it returns Cygwin::pid_to_winpid($$). But under the PT
