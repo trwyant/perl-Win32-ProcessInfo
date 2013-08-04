@@ -63,6 +63,7 @@ Roth
 SID
 subclasses
 SubProcInfo
+Sugalski
 cc
 clunks
 de
