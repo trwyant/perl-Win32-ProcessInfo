@@ -415,7 +415,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 Copyright (C) 2001-2005 by E. I. DuPont de Nemours and Company, Inc.
 
-Copyright (C) 2007, 2010-2011, 2013 by Thomas R. Wyant, III
+Copyright (C) 2007, 2010-2011, 2013-2014 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
