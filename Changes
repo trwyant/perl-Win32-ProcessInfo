@@ -1,3 +1,7 @@
+1.020_01	2014-11-19	T. R. Wyant
+  Some tweaks to author testing, and move code from Subversion to Git.
+    None of this should affect the user, but ...
+
 1.020		2013-02-24	T. R. Wyant
   No changes since 1.019_04.
 
@@ -214,3 +218,4 @@
 0.010		2002-09-02	T. R. Wyant
   Released to CPAN.
 
+# ex: set textwidth=72 autoindent :
